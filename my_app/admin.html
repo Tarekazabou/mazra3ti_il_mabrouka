@@ -157,11 +157,69 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th {
+            padding: 10px;
+            text-align: right;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table tr:hover {
+            background: #f3f4f6 !important;
+        }
+
+        .stat-box {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+
+        .stat-box p {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌾 لوحة تحكم مزرعة المبروكة 🌾</h1>
+
+        <!-- Statistics Section -->
+        <div class="card">
+            <h2>📊 إحصائيات النظام</h2>
+            <div id="statsContainer">
+                <p>جاري تحميل الإحصائيات...</p>
+            </div>
+            <button onclick="loadStats()" style="margin-top: 10px;">تحديث الإحصائيات</button>
+        </div>
+
+        <!-- Users List Section -->
+        <div class="card">
+            <h2>👥 قائمة المزارعات</h2>
+            <div id="usersContainer">
+                <p>جاري تحميل المستخدمات...</p>
+            </div>
+            <button onclick="loadUsers()" style="margin-top: 10px;">تحديث القائمة</button>
+        </div>
 
         <!-- Create Account Section -->
         <div class="card">
@@ -279,27 +337,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Backend API Integration -->
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-        // TODO: Replace with your Firebase config
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        // Backend API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api/admin';
 
         // Helper functions
         function showMessage(elementId, message, isError = false) {
@@ -315,6 +356,29 @@
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
         }
 
+        // API Helper function
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || data.message || 'فشل الاتصال بالخادم');
+            }
+            
+            return data;
+        }
+
         // Create Account Form Handler
         document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -322,39 +386,33 @@
 
             try {
                 const email = document.getElementById('farmerEmail').value;
-                const password = document.getElementById('farmerPassword').value;
                 const name = document.getElementById('farmerName').value;
                 const location = document.getElementById('farmLocation').value;
                 const size = parseFloat(document.getElementById('farmSize').value);
 
-                // Create authentication account
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const userId = userCredential.user.uid;
-
-                // Create farmer document in Firestore
-                await setDoc(doc(db, 'farmers', userId), {
-                    name: name,
+                // Call backend API to create user
+                const result = await apiCall('/users', 'POST', {
                     email: email,
-                    farmLocation: location,
-                    farmSize: size,
-                    createdAt: Timestamp.now(),
-                    vegetation: []
+                    name: name,
+                    location: location,
+                    soil_properties: {
+                        soil_type: "loam",
+                        soil_compaction: 55,
+                        slope_degrees: 3.5
+                    },
+                    plants: [] // Start with no plants
                 });
 
-                // Create initial measurements document
-                await setDoc(doc(db, 'measurements', userId), {
-                    farmerId: userId,
-                    soilMoisture: 'moderate',
-                    pumpStatus: 'off',
-                    tankWater: 'half',
-                    weatherAlert: 'nothing',
-                    controlMode: 'automatic',
-                    valveStatus: 'closed',
-                    lastUpdated: Timestamp.now()
-                });
-
-                showMessage('accountSuccess', `تم إنشاء الحساب بنجاح! معرف المزارعة: ${userId}`);
-                document.getElementById('createAccountForm').reset();
+                if (result.success) {
+                    const userId = result.user_id;
+                    showMessage('accountSuccess', `تم إنشاء الحساب بنجاح! معرف المزارعة: ${userId}`);
+                    document.getElementById('createAccountForm').reset();
+                    
+                    // Pre-fill the vegetation form with the new user ID
+                    document.getElementById('farmerIdVeg').value = userId;
+                } else {
+                    throw new Error(result.message || 'فشل إنشاء الحساب');
+                }
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('accountError', `خطأ: ${error.message}`, true);
@@ -386,15 +444,29 @@
                     throw new Error('الرجاء إدخال نوع نبات واحد على الأقل');
                 }
 
-                // Update farmer document with vegetation
-                const farmerRef = doc(db, 'farmers', farmerId);
-                await updateDoc(farmerRef, {
-                    vegetation: vegetation,
-                    vegetationUpdatedAt: Timestamp.now()
-                });
+                // Add each plant to the user via backend API
+                let successCount = 0;
+                for (const plantName of vegetation) {
+                    try {
+                        const result = await apiCall(`/users/${farmerId}/plants`, 'POST', {
+                            name: plantName,
+                            area_sqm: 100 // Default area, can be customized
+                        });
+                        
+                        if (result.success) {
+                            successCount++;
+                        }
+                    } catch (plantError) {
+                        console.error(`Error adding ${plantName}:`, plantError);
+                    }
+                }
 
-                showMessage('vegetationSuccess', 'تم إضافة النباتات بنجاح!');
-                document.getElementById('addVegetationForm').reset();
+                if (successCount > 0) {
+                    showMessage('vegetationSuccess', `تم إضافة ${successCount} من النباتات بنجاح!`);
+                    document.getElementById('addVegetationForm').reset();
+                } else {
+                    throw new Error('فشلت إضافة جميع النباتات');
+                }
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('vegetationError', `خطأ: ${error.message}`, true);
@@ -403,52 +475,123 @@
             }
         });
 
-        // Add Measurements Form Handler
+        // Add Measurements Form Handler - Updates user's AI mode and valve status
         document.getElementById('addMeasurementsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading(true);
 
             try {
                 const farmerId = document.getElementById('farmerIdMeas').value.trim();
-                const soilMoisture = document.getElementById('soilMoisture').value;
-                const pumpStatus = document.getElementById('pumpStatus').value;
-                const tankWater = document.getElementById('tankWater').value;
-                const weatherAlert = document.getElementById('weatherAlert').value;
                 const controlMode = document.getElementById('controlMode').value;
                 const valveStatus = document.getElementById('valveStatus').value;
 
-                // Update or create measurements document
-                const measurementRef = doc(db, 'measurements', farmerId);
-                await setDoc(measurementRef, {
-                    farmerId: farmerId,
-                    soilMoisture: soilMoisture,
-                    pumpStatus: pumpStatus,
-                    tankWater: tankWater,
-                    weatherAlert: weatherAlert,
-                    controlMode: controlMode,
-                    valveStatus: valveStatus,
-                    lastUpdated: Timestamp.now()
-                }, { merge: true });
-
-                // Also add to measurement history
-                await addDoc(collection(db, 'measurementHistory'), {
-                    farmerId: farmerId,
-                    soilMoisture: soilMoisture,
-                    pumpStatus: pumpStatus,
-                    tankWater: tankWater,
-                    weatherAlert: weatherAlert,
-                    controlMode: controlMode,
-                    valveStatus: valveStatus,
-                    timestamp: Timestamp.now()
+                // Update user's AI mode via backend API
+                const aiModeEnabled = controlMode === 'automatic';
+                
+                const result = await apiCall(`/users/${farmerId}`, 'PUT', {
+                    ai_mode: aiModeEnabled
                 });
 
-                showMessage('measurementsSuccess', 'تم حفظ القياسات بنجاح!');
+                if (result.success) {
+                    // If valve status changed, update it too
+                    const farmerApiBase = `http://localhost:5000/api/farmer/${farmerId}`;
+                    
+                    if (valveStatus === 'open') {
+                        await fetch(`${farmerApiBase}/valve/open`, { method: 'POST' });
+                    } else if (valveStatus === 'closed') {
+                        await fetch(`${farmerApiBase}/valve/close`, { method: 'POST' });
+                    }
+
+                    showMessage('measurementsSuccess', 'تم حفظ القياسات بنجاح!');
+                } else {
+                    throw new Error(result.message || 'فشل حفظ القياسات');
+                }
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('measurementsError', `خطأ: ${error.message}`, true);
             } finally {
                 showLoading(false);
             }
+        });
+
+        // Load Statistics
+        window.loadStats = async function() {
+            try {
+                const result = await apiCall('/stats', 'GET');
+                
+                if (result.success) {
+                    const stats = result.stats;
+                    document.getElementById('statsContainer').innerHTML = `
+                        <div class="grid">
+                            <div style="padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                                <h3 style="color: #0369a1; margin-bottom: 5px;">👥 إجمالي المستخدمات</h3>
+                                <p style="font-size: 28px; font-weight: bold; color: #0c4a6e;">${stats.total_users}</p>
+                            </div>
+                            <div style="padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                                <h3 style="color: #15803d; margin-bottom: 5px;">🤖 الوضع التلقائي</h3>
+                                <p style="font-size: 28px; font-weight: bold; color: #14532d;">${stats.active_ai_users}</p>
+                            </div>
+                            <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
+                                <h3 style="color: #b45309; margin-bottom: 5px;">🌱 إجمالي النباتات</h3>
+                                <p style="font-size: 28px; font-weight: bold; color: #78350f;">${stats.total_plants}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('statsContainer').innerHTML = `
+                    <p style="color: #ef4444;">خطأ في تحميل الإحصائيات: ${error.message}</p>
+                `;
+            }
+        };
+
+        // Load All Users
+        window.loadUsers = async function() {
+            try {
+                const result = await apiCall('/users', 'GET');
+                
+                if (result.success) {
+                    const users = result.users;
+                    
+                    if (users.length === 0) {
+                        document.getElementById('usersContainer').innerHTML = '<p>لا توجد مستخدمات بعد</p>';
+                        return;
+                    }
+
+                    let html = '<table style="width: 100%; border-collapse: collapse;">';
+                    html += '<thead><tr style="background: #667eea; color: white;">';
+                    html += '<th style="padding: 10px; text-align: right;">المعرف</th>';
+                    html += '<th style="padding: 10px; text-align: right;">الاسم</th>';
+                    html += '<th style="padding: 10px; text-align: right;">الموقع</th>';
+                    html += '<th style="padding: 10px; text-align: right;">عدد النباتات</th>';
+                    html += '<th style="padding: 10px; text-align: right;">الوضع التلقائي</th>';
+                    html += '</tr></thead><tbody>';
+
+                    users.forEach((user, index) => {
+                        const bgColor = index % 2 === 0 ? '#f9fafb' : '#ffffff';
+                        html += `<tr style="background: ${bgColor};">`;
+                        html += `<td style="padding: 10px; font-family: monospace; font-size: 12px;">${user.user_id}</td>`;
+                        html += `<td style="padding: 10px;">${user.name}</td>`;
+                        html += `<td style="padding: 10px;">${user.location}</td>`;
+                        html += `<td style="padding: 10px;">${user.plants ? user.plants.length : 0}</td>`;
+                        html += `<td style="padding: 10px;">${user.ai_mode ? '✅ مفعل' : '❌ معطل'}</td>`;
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table>';
+                    document.getElementById('usersContainer').innerHTML = html;
+                }
+            } catch (error) {
+                document.getElementById('usersContainer').innerHTML = `
+                    <p style="color: #ef4444;">خطأ في تحميل المستخدمات: ${error.message}</p>
+                `;
+            }
+        };
+
+        // Load stats and users on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadUsers();
         });
     </script>
 </body>

@@ -177,60 +177,94 @@ class FarmModel extends ChangeNotifier {
 
   /// Load farm state from backend API
   Future<void> loadFarmStateFromApi(String farmerId) async {
+    print('🔵 loadFarmStateFromApi called for farmer: $farmerId');
     _isLoading = true;
     _farmerId = farmerId;
     notifyListeners();
 
     try {
+      print('🔵 Fetching farm state from API...');
       final farmState = await _apiService.getFarmState(farmerId);
+      print('🔵 API Response: $farmState');
+      
       if (farmState != null && farmState['success'] == true) {
+        print('✅ Farm state loaded successfully!');
+        
         // Update farmer info
         if (farmState['user'] != null) {
           _farmerName = farmState['user']['name'] as String?;
+          print('👤 Farmer name: $_farmerName');
         }
 
-        // Update vegetation from plants
+        // Update vegetation from plants (actual user data!)
         if (farmState['plants'] is List) {
+          print('🌱 Raw plants data: ${farmState['plants']}');
           _vegetation = (farmState['plants'] as List)
               .map((p) => p['name'].toString())
               .toList();
+          print('🌱 Loaded plants into _vegetation: $_vegetation');
+          print('🌱 _vegetation list length: ${_vegetation.length}');
+        } else {
+          print('⚠️ No plants found in farmState or not a List');
         }
 
-        // Update valve status
+        // Update valve status (actual real-time status!)
         if (farmState['valve'] != null) {
           final valve = farmState['valve'];
           _valveStatus = valve['is_watering'] == true 
               ? ValveStatus.open 
               : ValveStatus.closed;
           
+          // Update control mode based on valve mode
           if (valve['mode'] == 'manual') {
             _controlMode = ControlMode.manual;
-          } else {
-            _controlMode = ControlMode.automatic;
           }
         }
 
-        // Update AI mode
+        // Update AI mode (from user settings)
         if (farmState['ai_mode'] != null) {
           _controlMode = farmState['ai_mode'] == true 
               ? ControlMode.automatic 
               : ControlMode.manual;
+          print('AI mode: ${_controlMode == ControlMode.automatic ? "Auto" : "Manual"}');
         }
 
-        // Update weather data
+        // Update weather data (real weather for user's location!)
         if (farmState['weather'] != null) {
           final weather = farmState['weather'];
-          // You can extend this to parse weather alerts
-          // For now, we'll keep the existing Firebase-based weather
+          
+          // Parse weather alerts from real data
+          if (weather['will_rain_soon'] == true) {
+            _weatherAlert = WeatherAlert.rainTomorrow;
+          } else if (weather['temperature'] != null && weather['temperature'] > 35) {
+            _weatherAlert = WeatherAlert.veryHot;
+          } else {
+            _weatherAlert = WeatherAlert.nothing;
+          }
+          
+          print('Weather updated: ${weather['summary']}');
         }
 
+        // Set realistic defaults for other values
+        // In a real app, these would also come from sensors
+        // For now, set reasonable defaults
+        _soilMoisture = SoilMoisture.moderate;
+        _pumpStatus = PumpStatus.off;
+        _tankWater = TankWater.half;
+
+        print('✅ All farm data loaded successfully');
+        print('📊 Final _vegetation: $_vegetation (count: ${_vegetation.length})');
         notifyListeners();
+        print('🔔 notifyListeners() called - UI should update now!');
+      } else {
+        print('❌ farmState is null or success != true');
       }
     } catch (e) {
-      print('Error loading farm state from API: $e');
+      print('❌ Error loading farm state from API: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
+      print('🏁 Loading complete, isLoading = false');
     }
   }
 
@@ -555,47 +589,133 @@ class FarmModel extends ChangeNotifier {
 
   // Dynamic vegetation methods (from Firebase)
   
-  /// Get display name for dynamic vegetation from Firebase
+  /// Get display name for dynamic vegetation from Firebase (with full Tunisia crops support)
   String getVegetationDisplayName(String vegetationName) {
-    // Check if it matches known types first
-    final lowerName = vegetationName.toLowerCase();
-    if (lowerName.contains('بطاطس') || lowerName == 'potato') {
-      return 'بطاطس';
-    } else if (lowerName.contains('طماطم') || lowerName == 'tomato') {
-      return 'طماطم';
-    } else if (lowerName.contains('بصل') || lowerName == 'onion') {
-      return 'بصل';
+    final lowerName = vegetationName.toLowerCase().replaceAll('_', ' ');
+    
+    // Arabic translations for all Tunisia crops
+    final translations = {
+      'potato': 'بطاطس',
+      'tomato': 'طماطم',
+      'onion': 'بصل',
+      'wheat': 'قمح',
+      'barley': 'شعير',
+      'olive': 'زيتون',
+      'date palm': 'نخيل التمر',
+      'date': 'تمر',
+      'palm': 'نخيل',
+      'citrus': 'حمضيات',
+      'pepper': 'فلفل',
+      'eggplant': 'باذنجان',
+      'cucumber': 'خيار',
+      'melon': 'شمام',
+      'watermelon': 'بطيخ',
+      'grape': 'عنب',
+      'almond': 'لوز',
+    };
+    
+    // Check if we have a translation
+    for (var entry in translations.entries) {
+      if (lowerName.contains(entry.key)) {
+        return entry.value;
+      }
     }
-    // Return as-is for custom vegetation
-    return vegetationName;
+    
+    // Capitalize first letter of English names
+    return vegetationName.split('_').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
   }
 
-  /// Get icon for dynamic vegetation
+  /// Get icon for dynamic vegetation (supports all Tunisia crops)
   IconData getVegetationIconForName(String vegetationName) {
-    final lowerName = vegetationName.toLowerCase();
-    if (lowerName.contains('بطاطس') || lowerName == 'potato') {
+    final lowerName = vegetationName.toLowerCase().replaceAll('_', ' ');
+    
+    // Vegetables
+    if (lowerName.contains('potato') || lowerName.contains('بطاطس')) {
       return Icons.eco;
-    } else if (lowerName.contains('طماطم') || lowerName == 'tomato') {
+    } else if (lowerName.contains('tomato') || lowerName.contains('طماطم')) {
       return Icons.local_florist;
-    } else if (lowerName.contains('بصل') || lowerName == 'onion') {
+    } else if (lowerName.contains('onion') || lowerName.contains('بصل')) {
       return Icons.spa;
+    } else if (lowerName.contains('pepper') || lowerName.contains('فلفل')) {
+      return Icons.local_fire_department;
+    } else if (lowerName.contains('eggplant') || lowerName.contains('باذنجان')) {
+      return Icons.eco_outlined;
+    } else if (lowerName.contains('cucumber') || lowerName.contains('خيار')) {
+      return Icons.grass;
     }
+    // Fruits
+    else if (lowerName.contains('olive') || lowerName.contains('زيتون')) {
+      return Icons.circle;
+    } else if (lowerName.contains('date') || lowerName.contains('palm') || lowerName.contains('تمر') || lowerName.contains('نخيل')) {
+      return Icons.park;
+    } else if (lowerName.contains('citrus') || lowerName.contains('orange') || lowerName.contains('برتقال')) {
+      return Icons.wb_sunny;
+    } else if (lowerName.contains('grape') || lowerName.contains('عنب')) {
+      return Icons.bubble_chart;
+    } else if (lowerName.contains('almond') || lowerName.contains('لوز')) {
+      return Icons.nature;
+    } else if (lowerName.contains('watermelon') || lowerName.contains('بطيخ')) {
+      return Icons.water_drop;
+    } else if (lowerName.contains('melon') || lowerName.contains('شمام')) {
+      return Icons.circle_outlined;
+    }
+    // Cereals
+    else if (lowerName.contains('wheat') || lowerName.contains('قمح')) {
+      return Icons.grain;
+    } else if (lowerName.contains('barley') || lowerName.contains('شعير')) {
+      return Icons.grass_outlined;
+    }
+    
     // Default icon for unknown vegetation
-    return Icons.grass;
+    return Icons.agriculture;
   }
 
-  /// Get color for dynamic vegetation
+  /// Get color for dynamic vegetation (supports all Tunisia crops)
   Color getVegetationColorForName(String vegetationName) {
-    final lowerName = vegetationName.toLowerCase();
-    if (lowerName.contains('بطاطس') || lowerName == 'potato') {
+    final lowerName = vegetationName.toLowerCase().replaceAll('_', ' ');
+    
+    // Vegetables
+    if (lowerName.contains('potato') || lowerName.contains('بطاطس')) {
       return Colors.brown;
-    } else if (lowerName.contains('طماطم') || lowerName == 'tomato') {
+    } else if (lowerName.contains('tomato') || lowerName.contains('طماطم')) {
       return Colors.red;
-    } else if (lowerName.contains('بصل') || lowerName == 'onion') {
+    } else if (lowerName.contains('onion') || lowerName.contains('بصل')) {
       return Colors.purple;
+    } else if (lowerName.contains('pepper') || lowerName.contains('فلفل')) {
+      return Colors.orange;
+    } else if (lowerName.contains('eggplant') || lowerName.contains('باذنجان')) {
+      return const Color(0xFF6A0DAD);
+    } else if (lowerName.contains('cucumber') || lowerName.contains('خيار')) {
+      return Colors.green;
     }
+    // Fruits
+    else if (lowerName.contains('olive') || lowerName.contains('زيتون')) {
+      return const Color(0xFF808000);
+    } else if (lowerName.contains('date') || lowerName.contains('palm') || lowerName.contains('تمر')) {
+      return const Color(0xFF8B4513);
+    } else if (lowerName.contains('citrus') || lowerName.contains('orange') || lowerName.contains('برتقال')) {
+      return Colors.orange;
+    } else if (lowerName.contains('grape') || lowerName.contains('عنب')) {
+      return Colors.purple;
+    } else if (lowerName.contains('almond') || lowerName.contains('لوز')) {
+      return const Color(0xFFD2691E);
+    } else if (lowerName.contains('watermelon') || lowerName.contains('بطيخ')) {
+      return const Color(0xFFDC143C);
+    } else if (lowerName.contains('melon') || lowerName.contains('شمام')) {
+      return const Color(0xFFFFD700);
+    }
+    // Cereals
+    else if (lowerName.contains('wheat') || lowerName.contains('قمح')) {
+      return const Color(0xFFF5DEB3);
+    } else if (lowerName.contains('barley') || lowerName.contains('شعير')) {
+      return const Color(0xFFDAA520);
+    }
+    
     // Default color for unknown vegetation
-    return Colors.green;
+    return const Color(0xFF4CAF50);
   }
 
   /// Check if has any vegetation

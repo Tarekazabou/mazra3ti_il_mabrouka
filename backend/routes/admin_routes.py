@@ -20,20 +20,21 @@ except ImportError:
     try:
         from backend.utils.gemini_decision import GeminiIrrigationDecision
     except ImportError:
-        from gemini_decision import GeminiIrrigationDecision
-    _gemini_instance = None
-    
-    def get_gemini():
-        global _gemini_instance
-        if _gemini_instance is None:
-            try:
-                _gemini_instance = GeminiIrrigationDecision()
-            except Exception:
-                pass
-        return _gemini_instance.model if _gemini_instance else None
-except Exception:
-    def get_gemini():
-        return None
+        GeminiIrrigationDecision = None
+
+# Global Gemini instance
+_gemini_instance = None
+
+def get_gemini():
+    """Get Gemini model instance (lazy initialization)"""
+    global _gemini_instance
+    if _gemini_instance is None and GeminiIrrigationDecision is not None:
+        try:
+            _gemini_instance = GeminiIrrigationDecision()
+        except Exception as e:
+            print(f"Warning: Could not initialize Gemini: {e}")
+            return None
+    return _gemini_instance.model if _gemini_instance else None
 
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')

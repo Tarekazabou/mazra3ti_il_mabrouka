@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'farm_model.dart';
 import 'overview_screen.dart';
 import 'voice_agent_screen.dart';
+import 'user_selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +75,11 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const UserSelectionScreen(),
+        '/home': (context) => const HomePage(),
+      },
     );
   }
 }
