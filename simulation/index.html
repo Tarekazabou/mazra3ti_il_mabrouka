@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WiEmpower Smart Irrigation System - Live Simulation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- START OVERLAY -->
+    <div id="startOverlay" class="start-overlay">
+      <div class="start-card">
+        <div class="start-logo">🌱💧🤖</div>
+        <h1>WiEmpower Smart Irrigation</h1>
+        <h2>AI-Powered Simulation</h2>
+        <p class="start-description">
+          Watch our hybrid XGBoost + Gemini AI make intelligent irrigation
+          decisions in real-time!
+        </p>
+        <button id="startButton" class="start-button">
+          🚀 START SIMULATION
+        </button>
+        <div class="start-features">
+          <span class="feature-badge">⚡ Real-Time Monitoring</span>
+          <span class="feature-badge">🧠 AI Decisions Every 10s</span>
+          <span class="feature-badge">💧 Water Conservation</span>
+          <span class="feature-badge">🎮 Manual Override</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo">
+          <h1>🌱 WiEmpower</h1>
+          <p>Smart Irrigation System Simulation</p>
+        </div>
+        <div class="system-status">
+          <span class="status-indicator" id="systemStatus">
+            <span class="pulse"></span>
+            System Active
+          </span>
+          <span class="time" id="currentTime">00:00:00</span>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Two Column Layout -->
+        <div class="simulation-layout">
+          <!-- Left Side: Farm Visualization -->
+          <section class="farm-section-compact">
+            <h2>🌾 Farm System Visualization</h2>
+            <div class="farm-container-compact">
+              <svg
+                id="farmSVG"
+                viewBox="0 0 1200 800"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <!-- Water Source -->
+                <g id="waterSource">
+                  <circle
+                    cx="100"
+                    cy="400"
+                    r="50"
+                    fill="#2196F3"
+                    stroke="#1976D2"
+                    stroke-width="3"
+                  />
+                  <text
+                    x="100"
+                    y="400"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="14"
+                    font-weight="bold"
+                  >
+                    💧
+                  </text>
+                  <text
+                    x="100"
+                    y="420"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="12"
+                  >
+                    WATER
+                  </text>
+                  <text
+                    x="100"
+                    y="435"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="12"
+                  >
+                    SOURCE
+                  </text>
+                  <!-- Pump -->
+                  <rect
+                    x="140"
+                    y="385"
+                    width="40"
+                    height="30"
+                    fill="#FF9800"
+                    stroke="#F57C00"
+                    stroke-width="2"
+                    rx="3"
+                  />
+                  <text
+                    x="160"
+                    y="405"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="10"
+                  >
+                    PUMP
+                  </text>
+                </g>
+
+                <!-- Main Pipe -->
+                <line
+                  x1="180"
+                  y1="400"
+                  x2="300"
+                  y2="400"
+                  stroke="#757575"
+                  stroke-width="12"
+                  stroke-linecap="round"
+                />
+
+                <!-- Farm Areas (4 areas in 2x2 grid) -->
+                <!-- Area 1: Top Left - Tomatoes -->
+                <g id="area1" class="farm-area">
+                  <rect
+                    x="350"
+                    y="100"
+                    width="350"
+                    height="250"
+                    fill="#8BC34A"
+                    stroke="#689F38"
+                    stroke-width="3"
+                    rx="10"
+                  />
+                  <pipe
+                    class="pipe"
+                    x1="300"
+                    y1="400"
+                    x2="350"
+                    y2="225"
+                    stroke="#757575"
+                    stroke-width="8"
+                  />
+                  <g class="valve" id="valve1" transform="translate(325, 312)">
+                    <rect
+                      x="-15"
+                      y="-15"
+                      width="30"
+                      height="30"
+                      fill="#607D8B"
+                      stroke="#455A64"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="8"
+                      fill="#f44336"
+                      class="valve-indicator"
+                    />
+                    <text
+                      x="0"
+                      y="5"
+                      text-anchor="middle"
+                      fill="white"
+                      font-size="10"
+                      font-weight="bold"
+                    >
+                      V1
+                    </text>
+                  </g>
+                  <text
+                    x="525"
+                    y="130"
+                    text-anchor="middle"
+                    font-size="18"
+                    font-weight="bold"
+                    fill="#33691E"
+                  >
+                    🍅 Area 1: Tomatoes
+                  </text>
+                  <g class="sensor-group" transform="translate(400, 170)">
+                    <rect
+                      width="200"
+                      height="160"
+                      fill="rgba(255,255,255,0.9)"
+                      rx="8"
+                      stroke="#689F38"
+                      stroke-width="2"
+                    />
+                    <text
+                      x="100"
+                      y="25"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                    >
+                      Sensors & Status
+                    </text>
+                    <text x="10" y="50" font-size="12">
+                      💧 Moisture:
+                      <tspan id="moisture1" font-weight="bold">--</tspan>
+                      %
+                    </text>
+                    <text x="10" y="70" font-size="12">
+                      🌡️ Temp:
+                      <tspan id="temp1" font-weight="bold">--</tspan>
+                      °C
+                    </text>
+                    <text x="10" y="90" font-size="12">
+                      🔧 Valve:
+                      <tspan id="valveStatus1" font-weight="bold">CLOSED</tspan>
+                    </text>
+                    <text x="10" y="110" font-size="12">
+                      ⏱️ Last Water:
+                      <tspan id="lastWater1" font-weight="bold">--</tspan>
+                    </text>
+                    <text x="10" y="135" font-size="11" fill="#666">
+                      🤖 AI Decision:
+                    </text>
+                    <text
+                      x="10"
+                      y="150"
+                      font-size="10"
+                      id="aiDecision1"
+                      fill="#1976D2"
+                    >
+                      Waiting...
+                    </text>
+                  </g>
+                  <!-- Arduino + Sensor -->
+                  <g class="hardware" transform="translate(420, 270)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#00BCD4"
+                      stroke="#0097A7"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Arduino
+                    </text>
+                    <text
+                      x="25"
+                      y="30"
+                      text-anchor="middle"
+                      font-size="8"
+                      fill="white"
+                    >
+                      #1
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(510, 270)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#9C27B0"
+                      stroke="#7B1FA2"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Sensor
+                    </text>
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="25"
+                      y2="35"
+                      stroke="#FFD700"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+
+                <!-- Area 2: Top Right - Peppers -->
+                <g id="area2" class="farm-area">
+                  <rect
+                    x="750"
+                    y="100"
+                    width="350"
+                    height="250"
+                    fill="#8BC34A"
+                    stroke="#689F38"
+                    stroke-width="3"
+                    rx="10"
+                  />
+                  <pipe
+                    class="pipe"
+                    x1="300"
+                    y1="400"
+                    x2="750"
+                    y2="225"
+                    stroke="#757575"
+                    stroke-width="8"
+                  />
+                  <g class="valve" id="valve2" transform="translate(525, 312)">
+                    <rect
+                      x="-15"
+                      y="-15"
+                      width="30"
+                      height="30"
+                      fill="#607D8B"
+                      stroke="#455A64"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="8"
+                      fill="#f44336"
+                      class="valve-indicator"
+                    />
+                    <text
+                      x="0"
+                      y="5"
+                      text-anchor="middle"
+                      fill="white"
+                      font-size="10"
+                      font-weight="bold"
+                    >
+                      V2
+                    </text>
+                  </g>
+                  <text
+                    x="925"
+                    y="130"
+                    text-anchor="middle"
+                    font-size="18"
+                    font-weight="bold"
+                    fill="#33691E"
+                  >
+                    🌶️ Area 2: Peppers
+                  </text>
+                  <g class="sensor-group" transform="translate(800, 170)">
+                    <rect
+                      width="200"
+                      height="160"
+                      fill="rgba(255,255,255,0.9)"
+                      rx="8"
+                      stroke="#689F38"
+                      stroke-width="2"
+                    />
+                    <text
+                      x="100"
+                      y="25"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                    >
+                      Sensors & Status
+                    </text>
+                    <text x="10" y="50" font-size="12">
+                      💧 Moisture:
+                      <tspan id="moisture2" font-weight="bold">--</tspan>
+                      %
+                    </text>
+                    <text x="10" y="70" font-size="12">
+                      🌡️ Temp:
+                      <tspan id="temp2" font-weight="bold">--</tspan>
+                      °C
+                    </text>
+                    <text x="10" y="90" font-size="12">
+                      🔧 Valve:
+                      <tspan id="valveStatus2" font-weight="bold">CLOSED</tspan>
+                    </text>
+                    <text x="10" y="110" font-size="12">
+                      ⏱️ Last Water:
+                      <tspan id="lastWater2" font-weight="bold">--</tspan>
+                    </text>
+                    <text x="10" y="135" font-size="11" fill="#666">
+                      🤖 AI Decision:
+                    </text>
+                    <text
+                      x="10"
+                      y="150"
+                      font-size="10"
+                      id="aiDecision2"
+                      fill="#1976D2"
+                    >
+                      Waiting...
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(820, 270)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#00BCD4"
+                      stroke="#0097A7"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Arduino
+                    </text>
+                    <text
+                      x="25"
+                      y="30"
+                      text-anchor="middle"
+                      font-size="8"
+                      fill="white"
+                    >
+                      #2
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(910, 270)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#9C27B0"
+                      stroke="#7B1FA2"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Sensor
+                    </text>
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="25"
+                      y2="35"
+                      stroke="#FFD700"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+
+                <!-- Area 3: Bottom Left - Wheat -->
+                <g id="area3" class="farm-area">
+                  <rect
+                    x="350"
+                    y="450"
+                    width="350"
+                    height="250"
+                    fill="#8BC34A"
+                    stroke="#689F38"
+                    stroke-width="3"
+                    rx="10"
+                  />
+                  <pipe
+                    class="pipe"
+                    x1="300"
+                    y1="400"
+                    x2="350"
+                    y2="575"
+                    stroke="#757575"
+                    stroke-width="8"
+                  />
+                  <g class="valve" id="valve3" transform="translate(325, 487)">
+                    <rect
+                      x="-15"
+                      y="-15"
+                      width="30"
+                      height="30"
+                      fill="#607D8B"
+                      stroke="#455A64"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="8"
+                      fill="#f44336"
+                      class="valve-indicator"
+                    />
+                    <text
+                      x="0"
+                      y="5"
+                      text-anchor="middle"
+                      fill="white"
+                      font-size="10"
+                      font-weight="bold"
+                    >
+                      V3
+                    </text>
+                  </g>
+                  <text
+                    x="525"
+                    y="480"
+                    text-anchor="middle"
+                    font-size="18"
+                    font-weight="bold"
+                    fill="#33691E"
+                  >
+                    🌾 Area 3: Wheat
+                  </text>
+                  <g class="sensor-group" transform="translate(400, 520)">
+                    <rect
+                      width="200"
+                      height="160"
+                      fill="rgba(255,255,255,0.9)"
+                      rx="8"
+                      stroke="#689F38"
+                      stroke-width="2"
+                    />
+                    <text
+                      x="100"
+                      y="25"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                    >
+                      Sensors & Status
+                    </text>
+                    <text x="10" y="50" font-size="12">
+                      💧 Moisture:
+                      <tspan id="moisture3" font-weight="bold">--</tspan>
+                      %
+                    </text>
+                    <text x="10" y="70" font-size="12">
+                      🌡️ Temp:
+                      <tspan id="temp3" font-weight="bold">--</tspan>
+                      °C
+                    </text>
+                    <text x="10" y="90" font-size="12">
+                      🔧 Valve:
+                      <tspan id="valveStatus3" font-weight="bold">CLOSED</tspan>
+                    </text>
+                    <text x="10" y="110" font-size="12">
+                      ⏱️ Last Water:
+                      <tspan id="lastWater3" font-weight="bold">--</tspan>
+                    </text>
+                    <text x="10" y="135" font-size="11" fill="#666">
+                      🤖 AI Decision:
+                    </text>
+                    <text
+                      x="10"
+                      y="150"
+                      font-size="10"
+                      id="aiDecision3"
+                      fill="#1976D2"
+                    >
+                      Waiting...
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(420, 620)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#00BCD4"
+                      stroke="#0097A7"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Arduino
+                    </text>
+                    <text
+                      x="25"
+                      y="30"
+                      text-anchor="middle"
+                      font-size="8"
+                      fill="white"
+                    >
+                      #3
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(510, 620)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#9C27B0"
+                      stroke="#7B1FA2"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Sensor
+                    </text>
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="25"
+                      y2="35"
+                      stroke="#FFD700"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+
+                <!-- Area 4: Bottom Right - Olives -->
+                <g id="area4" class="farm-area">
+                  <rect
+                    x="750"
+                    y="450"
+                    width="350"
+                    height="250"
+                    fill="#8BC34A"
+                    stroke="#689F38"
+                    stroke-width="3"
+                    rx="10"
+                  />
+                  <pipe
+                    class="pipe"
+                    x1="300"
+                    y1="400"
+                    x2="750"
+                    y2="575"
+                    stroke="#757575"
+                    stroke-width="8"
+                  />
+                  <g class="valve" id="valve4" transform="translate(525, 487)">
+                    <rect
+                      x="-15"
+                      y="-15"
+                      width="30"
+                      height="30"
+                      fill="#607D8B"
+                      stroke="#455A64"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="8"
+                      fill="#f44336"
+                      class="valve-indicator"
+                    />
+                    <text
+                      x="0"
+                      y="5"
+                      text-anchor="middle"
+                      fill="white"
+                      font-size="10"
+                      font-weight="bold"
+                    >
+                      V4
+                    </text>
+                  </g>
+                  <text
+                    x="925"
+                    y="480"
+                    text-anchor="middle"
+                    font-size="18"
+                    font-weight="bold"
+                    fill="#33691E"
+                  >
+                    🫒 Area 4: Olives
+                  </text>
+                  <g class="sensor-group" transform="translate(800, 520)">
+                    <rect
+                      width="200"
+                      height="160"
+                      fill="rgba(255,255,255,0.9)"
+                      rx="8"
+                      stroke="#689F38"
+                      stroke-width="2"
+                    />
+                    <text
+                      x="100"
+                      y="25"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                    >
+                      Sensors & Status
+                    </text>
+                    <text x="10" y="50" font-size="12">
+                      💧 Moisture:
+                      <tspan id="moisture4" font-weight="bold">--</tspan>
+                      %
+                    </text>
+                    <text x="10" y="70" font-size="12">
+                      🌡️ Temp:
+                      <tspan id="temp4" font-weight="bold">--</tspan>
+                      °C
+                    </text>
+                    <text x="10" y="90" font-size="12">
+                      🔧 Valve:
+                      <tspan id="valveStatus4" font-weight="bold">CLOSED</tspan>
+                    </text>
+                    <text x="10" y="110" font-size="12">
+                      ⏱️ Last Water:
+                      <tspan id="lastWater4" font-weight="bold">--</tspan>
+                    </text>
+                    <text x="10" y="135" font-size="11" fill="#666">
+                      🤖 AI Decision:
+                    </text>
+                    <text
+                      x="10"
+                      y="150"
+                      font-size="10"
+                      id="aiDecision4"
+                      fill="#1976D2"
+                    >
+                      Waiting...
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(820, 620)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#00BCD4"
+                      stroke="#0097A7"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Arduino
+                    </text>
+                    <text
+                      x="25"
+                      y="30"
+                      text-anchor="middle"
+                      font-size="8"
+                      fill="white"
+                    >
+                      #4
+                    </text>
+                  </g>
+                  <g class="hardware" transform="translate(910, 620)">
+                    <rect
+                      width="50"
+                      height="35"
+                      fill="#9C27B0"
+                      stroke="#7B1FA2"
+                      stroke-width="2"
+                      rx="3"
+                    />
+                    <text
+                      x="25"
+                      y="20"
+                      text-anchor="middle"
+                      font-size="9"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      Sensor
+                    </text>
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="25"
+                      y2="35"
+                      stroke="#FFD700"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+
+                <!-- Raspberry Pi (Center) -->
+                <g id="raspberryPi" transform="translate(550, 360)">
+                  <rect
+                    width="100"
+                    height="80"
+                    fill="#C2185B"
+                    stroke="#880E4F"
+                    stroke-width="3"
+                    rx="5"
+                  />
+                  <text
+                    x="50"
+                    y="30"
+                    text-anchor="middle"
+                    font-size="14"
+                    fill="white"
+                    font-weight="bold"
+                  >
+                    🥧 Raspberry Pi
+                  </text>
+                  <text
+                    x="50"
+                    y="50"
+                    text-anchor="middle"
+                    font-size="11"
+                    fill="white"
+                  >
+                    Central Hub
+                  </text>
+                  <circle
+                    cx="50"
+                    cy="65"
+                    r="5"
+                    fill="#4CAF50"
+                    class="pi-status-light"
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="1;0.3;1"
+                      dur="2s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+
+                <!-- Cloud Connection -->
+                <g id="cloudConnection">
+                  <line
+                    x1="600"
+                    y1="360"
+                    x2="600"
+                    y2="50"
+                    stroke="#2196F3"
+                    stroke-width="3"
+                    stroke-dasharray="10,5"
+                  >
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      from="0"
+                      to="15"
+                      dur="1s"
+                      repeatCount="indefinite"
+                    />
+                  </line>
+                  <g transform="translate(550, 10)">
+                    <ellipse
+                      cx="50"
+                      cy="30"
+                      rx="60"
+                      ry="30"
+                      fill="#2196F3"
+                      opacity="0.9"
+                    />
+                    <ellipse
+                      cx="30"
+                      cy="35"
+                      rx="40"
+                      ry="20"
+                      fill="#64B5F6"
+                      opacity="0.8"
+                    />
+                    <ellipse
+                      cx="70"
+                      cy="35"
+                      rx="40"
+                      ry="20"
+                      fill="#64B5F6"
+                      opacity="0.8"
+                    />
+                    <text
+                      x="50"
+                      y="40"
+                      text-anchor="middle"
+                      font-size="16"
+                      fill="white"
+                      font-weight="bold"
+                    >
+                      ☁️ Cloud Server
+                    </text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </section>
+
+          <!-- Right Side: Mobile Phone Mockup with Farmer UI -->
+          <section class="phone-mockup-section">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <!-- Farmer Mobile App UI -->
+                <div class="farmer-app">
+                  <!-- App Header -->
+                  <div class="app-header">
+                    <h3>مزرعتي 🌱</h3>
+                  </div>
+
+                  <!-- Status Card -->
+                  <div class="status-card" id="mainStatusCard">
+                    <div class="status-icon-container">
+                      <div class="status-icon">🌿</div>
+                    </div>
+                    <h2 class="status-title" id="statusTitle">
+                      كل شيء على ما يرام
+                    </h2>
+                    <p class="status-subtitle" id="statusSubtitle">
+                      المزرعة في حالة جيدة
+                    </p>
+                  </div>
+
+                  <!-- Farm Stats -->
+                  <div class="farm-stats">
+                    <div class="stat-box">
+                      <div class="stat-icon">💧</div>
+                      <p class="stat-label">مياه الخزان</p>
+                      <p class="stat-value">85%</p>
+                    </div>
+                    <div class="stat-box">
+                      <div class="stat-icon">🌡️</div>
+                      <p class="stat-label">درجة الحرارة</p>
+                      <p class="stat-value" id="phoneTemp">28°C</p>
+                    </div>
+                  </div>
+
+                  <!-- AI Mode Toggle -->
+                  <div class="control-section">
+                    <div class="section-header">
+                      <div class="header-line"></div>
+                      <h4>وضع التحكم</h4>
+                    </div>
+                    <div class="ai-toggle-container">
+                      <div class="toggle-info">
+                        <span class="toggle-icon">🤖</span>
+                        <div class="toggle-text">
+                          <strong id="aiModeLabel">التحكم الذكي (AI)</strong>
+                          <small id="aiModeDesc"
+                            >الذكاء الاصطناعي يدير الري تلقائياً</small
+                          >
+                        </div>
+                      </div>
+                      <label class="toggle-switch">
+                        <input
+                          type="checkbox"
+                          id="aiModeToggle"
+                          checked
+                          onchange="toggleAIMode()"
+                        />
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Section Header -->
+                  <div class="section-header">
+                    <div class="header-line"></div>
+                    <h4>محاصيل المزرعة</h4>
+                  </div>
+
+                  <!-- Vegetation Cards -->
+                  <div class="vegetation-list">
+                    <div class="veg-card" id="vegCard1">
+                      <div class="veg-header">
+                        <span class="veg-icon">🍅</span>
+                        <span class="veg-name">الطماطم</span>
+                        <span
+                          class="veg-status status-good"
+                          id="phoneVegStatus1"
+                          >●</span
+                        >
+                      </div>
+                      <div class="veg-info">
+                        <div class="veg-metric">
+                          <span>الرطوبة</span>
+                          <strong id="phoneM1">--</strong>
+                        </div>
+                        <div class="veg-metric">
+                          <span>الحالة</span>
+                          <strong id="phoneS1" class="status-text-good"
+                            >ممتاز</strong
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="manual-controls"
+                        id="manualControls1"
+                        style="display: none"
+                      >
+                        <button
+                          class="valve-btn valve-open"
+                          onclick="manualValveControl(1, true)"
+                        >
+                          <span>💧</span>
+                          <span>فتح الصمام</span>
+                        </button>
+                        <button
+                          class="valve-btn valve-close"
+                          onclick="manualValveControl(1, false)"
+                        >
+                          <span>🚫</span>
+                          <span>إغلاق الصمام</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="veg-card" id="vegCard2">
+                      <div class="veg-header">
+                        <span class="veg-icon">🌶️</span>
+                        <span class="veg-name">الفلفل</span>
+                        <span
+                          class="veg-status status-good"
+                          id="phoneVegStatus2"
+                          >●</span
+                        >
+                      </div>
+                      <div class="veg-info">
+                        <div class="veg-metric">
+                          <span>الرطوبة</span>
+                          <strong id="phoneM2">--</strong>
+                        </div>
+                        <div class="veg-metric">
+                          <span>الحالة</span>
+                          <strong id="phoneS2" class="status-text-good"
+                            >ممتاز</strong
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="manual-controls"
+                        id="manualControls2"
+                        style="display: none"
+                      >
+                        <button
+                          class="valve-btn valve-open"
+                          onclick="manualValveControl(2, true)"
+                        >
+                          <span>💧</span>
+                          <span>فتح الصمام</span>
+                        </button>
+                        <button
+                          class="valve-btn valve-close"
+                          onclick="manualValveControl(2, false)"
+                        >
+                          <span>🚫</span>
+                          <span>إغلاق الصمام</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="veg-card" id="vegCard3">
+                      <div class="veg-header">
+                        <span class="veg-icon">�</span>
+                        <span class="veg-name">القمح</span>
+                        <span
+                          class="veg-status status-good"
+                          id="phoneVegStatus3"
+                          >●</span
+                        >
+                      </div>
+                      <div class="veg-info">
+                        <div class="veg-metric">
+                          <span>الرطوبة</span>
+                          <strong id="phoneM3">--</strong>
+                        </div>
+                        <div class="veg-metric">
+                          <span>الحالة</span>
+                          <strong id="phoneS3" class="status-text-good"
+                            >ممتاز</strong
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="manual-controls"
+                        id="manualControls3"
+                        style="display: none"
+                      >
+                        <button
+                          class="valve-btn valve-open"
+                          onclick="manualValveControl(3, true)"
+                        >
+                          <span>💧</span>
+                          <span>فتح الصمام</span>
+                        </button>
+                        <button
+                          class="valve-btn valve-close"
+                          onclick="manualValveControl(3, false)"
+                        >
+                          <span>🚫</span>
+                          <span>إغلاق الصمام</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="veg-card" id="vegCard4">
+                      <div class="veg-header">
+                        <span class="veg-icon">🫒</span>
+                        <span class="veg-name">الزيتون</span>
+                        <span
+                          class="veg-status status-good"
+                          id="phoneVegStatus4"
+                          >●</span
+                        >
+                      </div>
+                      <div class="veg-info">
+                        <div class="veg-metric">
+                          <span>الرطوبة</span>
+                          <strong id="phoneM4">--</strong>
+                        </div>
+                        <div class="veg-metric">
+                          <span>الحالة</span>
+                          <strong id="phoneS4" class="status-text-good"
+                            >ممتاز</strong
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="manual-controls"
+                        id="manualControls4"
+                        style="display: none"
+                      >
+                        <button
+                          class="valve-btn valve-open"
+                          onclick="manualValveControl(4, true)"
+                        >
+                          <span>💧</span>
+                          <span>فتح الصمام</span>
+                        </button>
+                        <button
+                          class="valve-btn valve-close"
+                          onclick="manualValveControl(4, false)"
+                        >
+                          <span>🚫</span>
+                          <span>إغلاق الصمام</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="phone-button"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Control Panel (Now Below) -->
+        <section class="control-panel">
+          <div class="panel-header">
+            <h2>🎮 Technical Control Panel</h2>
+            <div class="mode-toggle">
+              <label class="switch">
+                <input type="checkbox" id="aiModeToggle" checked />
+                <span class="slider"></span>
+              </label>
+              <span id="modeLabel">AI Mode: ON</span>
+            </div>
+          </div>
+
+          <div class="controls-grid">
+            <!-- Manual Controls for each area -->
+            <div class="control-card">
+              <h3>Area 1 - Tomatoes</h3>
+              <button
+                class="btn btn-open"
+                onclick="manualControl(1, true)"
+                id="open1"
+              >
+                Open Valve
+              </button>
+              <button
+                class="btn btn-close"
+                onclick="manualControl(1, false)"
+                id="close1"
+              >
+                Close Valve
+              </button>
+            </div>
+
+            <div class="control-card">
+              <h3>Area 2 - Peppers</h3>
+              <button
+                class="btn btn-open"
+                onclick="manualControl(2, true)"
+                id="open2"
+              >
+                Open Valve
+              </button>
+              <button
+                class="btn btn-close"
+                onclick="manualControl(2, false)"
+                id="close2"
+              >
+                Close Valve
+              </button>
+            </div>
+
+            <div class="control-card">
+              <h3>Area 3 - Wheat</h3>
+              <button
+                class="btn btn-open"
+                onclick="manualControl(3, true)"
+                id="open3"
+              >
+                Open Valve
+              </button>
+              <button
+                class="btn btn-close"
+                onclick="manualControl(3, false)"
+                id="close3"
+              >
+                Close Valve
+              </button>
+            </div>
+
+            <div class="control-card">
+              <h3>Area 4 - Olives</h3>
+              <button
+                class="btn btn-open"
+                onclick="manualControl(4, true)"
+                id="open4"
+              >
+                Open Valve
+              </button>
+              <button
+                class="btn btn-close"
+                onclick="manualControl(4, false)"
+                id="close4"
+              >
+                Close Valve
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- AI Decision Log -->
+        <section class="decision-log">
+          <h2>🤖 AI Decision Log (Hybrid XGBoost + Gemini)</h2>
+          <div class="log-container" id="decisionLog">
+            <div class="log-entry">
+              <span class="log-time">System initialized</span>
+              <span class="log-message"
+                >Waiting for first AI decision cycle...</span
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- System Info -->
+        <section class="system-info">
+          <div class="info-card">
+            <h3>📊 System Statistics</h3>
+            <p>Total AI Decisions: <strong id="totalDecisions">0</strong></p>
+            <p>Active Valves: <strong id="activeValves">0/4</strong></p>
+            <p>Water Saved: <strong id="waterSaved">0</strong> Liters</p>
+            <p style="font-size: 18px; color: #ff9800; margin-top: 10px">
+              ⏱️ Next Decision in:
+              <strong id="nextDecision" style="font-size: 24px; color: #ff5722"
+                >00:10</strong
+              >
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>🌤️ Weather Forecast</h3>
+            <p>Temperature: <strong id="weatherTemp">--</strong>°C</p>
+            <p>Humidity: <strong id="weatherHumidity">--</strong>%</p>
+            <p>Rain Probability: <strong id="rainProb">--</strong>%</p>
+            <p>Expected Rain: <strong id="expectedRain">--</strong>mm</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🧠 AI Decision Process</h3>
+            <p style="font-size: 12px; color: #666; margin-bottom: 15px">
+              AI makes decisions every
+              <strong style="color: #10b981">8 seconds</strong>
+            </p>
+            <div class="ai-flow">
+              <div class="flow-step">
+                1️⃣ XGBoost Model<br /><small
+                  >Initial decision based on sensor data</small
+                >
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                2️⃣ Gemini AI<br /><small
+                  >Refines decision with weather forecast</small
+                >
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                3️⃣ Final Action<br /><small>Valve control & duration</small>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <p>WiEmpower Smart Irrigation System - Innovation Challenge 2025</p>
+        <p>Hybrid AI Decision Making: XGBoost + Google Gemini</p>
+      </footer>
+    </div>
+
+    <script src="simulation.js"></script>
+  </body>
+</html>
