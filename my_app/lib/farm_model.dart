@@ -646,16 +646,7 @@ class FarmModel extends ChangeNotifier {
     }
   }
 
-  static String getVegetationImage(VegetationType type) {
-    switch (type) {
-      case VegetationType.potato:
-        return "assets/images/potato.png";
-      case VegetationType.tomato:
-        return "assets/images/tomato.png";
-      case VegetationType.onion:
-        return "assets/images/onion.png";
-    }
-  }
+  
 
   // Dynamic vegetation methods (from Firebase)
   
@@ -786,6 +777,71 @@ class FarmModel extends ChangeNotifier {
     
     // Default color for unknown vegetation
     return const Color(0xFF4CAF50);
+  }
+
+  /// Get image asset path for dynamic vegetation (supports many crops)
+  /// Falls back to a generic produce image if no specific asset is found.
+  String getVegetationImageForName(String vegetationName) {
+    final lowerName = vegetationName.toLowerCase().replaceAll('_', ' ');
+
+    // Core set (lowercase filenames)
+    if (lowerName.contains('potato') || lowerName.contains('بطاطس')) {
+      return 'assets/images/potato.png';
+    } else if (lowerName.contains('tomato') || lowerName.contains('طماطم')) {
+      return 'assets/images/tomato.png';
+    } else if (lowerName.contains('onion') || lowerName.contains('بصل')) {
+      return 'assets/images/onion.png';
+    }
+
+    // Vegetables (PascalCase filenames)
+    if (lowerName.contains('pepper') || lowerName.contains('فلفل')) {
+      return 'assets/images/Pepper.png';
+    } else if (lowerName.contains('cucumber') || lowerName.contains('خيار')) {
+      return 'assets/images/Cucumber.png';
+    } else if (lowerName.contains('eggplant') || lowerName.contains('باذنجان')) {
+      return 'assets/images/Eggplant.png';
+    } else if (lowerName.contains('cabbage')) {
+      return 'assets/images/Cabbage.png';
+    } else if (lowerName.contains('carrot')) {
+      return 'assets/images/Carrot.png';
+    } else if (lowerName.contains('garlic')) {
+      return 'assets/images/Garlic.png';
+    } else if (lowerName.contains('beetroot')) {
+      return 'assets/images/Beetroot.png';
+    } else if (lowerName.contains('radish')) {
+      return 'assets/images/Radish.png';
+    } else if (lowerName.contains('turnip')) {
+      return 'assets/images/Turnip.png';
+    }
+
+    // Fruits (PascalCase filenames)
+    if (lowerName.contains('grape') || lowerName.contains('عنب')) {
+      return 'assets/images/Grapes.png';
+    } else if (lowerName.contains('apple')) {
+      return 'assets/images/Apple.png';
+    } else if (lowerName.contains('apricot')) {
+      return 'assets/images/Apricot.png';
+    } else if (lowerName.contains('fig')) {
+      return 'assets/images/Fig.png';
+    } else if (lowerName.contains('peach')) {
+      return 'assets/images/Peach.png';
+    } else if (lowerName.contains('pear')) {
+      return 'assets/images/Pear.png';
+    } else if (lowerName.contains('plum')) {
+      return 'assets/images/Plum.png';
+    } else if (lowerName.contains('pomegranate')) {
+      return 'assets/images/Pomegranate.png';
+    } else if (lowerName.contains('nectarine')) {
+      return 'assets/images/Nectarine.png';
+    } else if (lowerName.contains('strawberry')) {
+      return 'assets/images/Strawberry.png';
+    } else if (lowerName.contains('raspberry')) {
+      return 'assets/images/Raspberry.png';
+    }
+
+    // Unknown or currently unsupported crops (olive, date, citrus, almond, melon, wheat, barley, etc.)
+    // Fall back to a generic produce image.
+    return 'assets/images/Apple.png';
   }
 
   /// Check if has any vegetation
