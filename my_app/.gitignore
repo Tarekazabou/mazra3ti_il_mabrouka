@@ -53,3 +53,8 @@ app.*.map.json
 .env
 .env.local
 .env.*.local
+*.env
+
+# Python cache from token generator
+__pycache__/
+*.pyc
