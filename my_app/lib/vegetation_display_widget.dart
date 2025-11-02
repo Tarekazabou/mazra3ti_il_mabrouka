@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:livekit_client/livekit_client.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit;
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
@@ -17,7 +17,7 @@ class VegetationDisplayWidget extends StatefulWidget {
 
 class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
   // LiveKit components
-  Room? _room;
+  livekit.Room? _room;
   bool _isConnecting = false;
   bool _isConnected = false;
   bool _isListening = false;
@@ -91,7 +91,7 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
       }
 
       // Initialize LiveKit room
-      _room = Room();
+      _room = livekit.Room();
       
       // Set up event listeners
       _room!.addListener(_onRoomUpdate);
@@ -141,11 +141,15 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
   /// Handle room updates
   void _onRoomUpdate() {
     // Handle room state changes
-    if (_room?.connectionState == ConnectionState.disconnected) {
-      setState(() {
-        _isConnected = false;
-        _statusMessage = 'انقطع الاتصال';
-      });
+    final room = _room;
+    if (room != null) {
+      // Check room connection state
+      if (room.connectionState == livekit.ConnectionState.disconnected) {
+        setState(() {
+          _isConnected = false;
+          _statusMessage = 'انقطع الاتصال';
+        });
+      }
     }
   }
 
@@ -156,16 +160,17 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
       _statusMessage = 'استمع لك...';
     });
     
-    // Listen to remote audio tracks
-    _room!.onTrackSubscribed = (track, publication, participant) {
-      if (track.kind == TrackType.AUDIO) {
-        _processAudioTrack(track as RemoteAudioTrack);
+    // Listen to remote audio tracks using the listener pattern
+    _room!.createListener().on<livekit.TrackSubscribedEvent>((event) {
+      final track = event.track;
+      if (track is livekit.RemoteAudioTrack) {
+        _processAudioTrack(track);
       }
-    };
+    });
   }
 
   /// Process audio track and send to Gemini
-  void _processAudioTrack(RemoteAudioTrack track) {
+  void _processAudioTrack(livekit.RemoteAudioTrack track) {
     // TODO: Implement full voice pipeline
     // 1. Convert audio to text using speech-to-text (Google Cloud Speech-to-Text)
     // 2. Send text to Gemini

@@ -159,7 +159,9 @@ prefer watering unless rain is VERY certain and VERY soon.
 - When in doubt, **water for productivity** rather than risk under-irrigation
 
 ## OUTPUT FORMAT (STRICT JSON)
-You must respond with ONLY valid JSON, no markdown formatting, no explanations outside JSON:
+You must respond with ONLY valid JSON, no markdown formatting, no explanations outside JSON.
+
+**IMPORTANT: All text fields in "reasoning" MUST be in Arabic (العربية) for Tunisian farmers!**
 
 {
   "final_decision": {
@@ -168,32 +170,39 @@ You must respond with ONLY valid JSON, no markdown formatting, no explanations o
     "intensity_percent": <integer: 0 if should_water=false, 20-100 if should_water=true>
   },
   "reasoning": {
-    "xgboost_recommendation": "<summary of XGBoost prediction>",
-    "weather_analysis": "<key weather insights from forecast>",
-    "decision_rationale": "<why you made this final decision>",
-    "adjustments_made": "<any changes from XGBoost prediction and why>",
+    "xgboost_recommendation": "<summary of XGBoost prediction IN ARABIC>",
+    "weather_analysis": "<key weather insights from forecast IN ARABIC>",
+    "decision_rationale": "<why you made this final decision IN ARABIC>",
+    "adjustments_made": "<any changes from XGBoost prediction and why IN ARABIC>",
     "confidence_level": "<high|medium|low>"
   },
   "water_savings": {
     "modified_from_xgboost": <boolean>,
     "estimated_water_saved_liters": <integer, 0 if no change or if watering>,
-    "conservation_note": "<brief note on water conservation>"
+    "conservation_note": "<brief note on water conservation IN ARABIC>"
   }
 }
 
-**CRITICAL**: When should_water is false, you MUST set duration_minutes=0 and intensity_percent=0. Do not provide watering parameters when not watering!
+**CRITICAL**: 
+- When should_water is false, you MUST set duration_minutes=0 and intensity_percent=0
+- ALL reasoning text fields (xgboost_recommendation, weather_analysis, decision_rationale, adjustments_made, conservation_note) MUST be written in ARABIC
+- Use clear, simple Arabic that farmers can understand
+- Avoid technical jargon, use everyday agricultural terms
 
 ## RESPONSE REQUIREMENTS
 1. **Always output valid JSON** - no markdown code blocks, no extra text
-2. **Be concise** - reasoning should be 1-2 sentences per field
-3. **Be decisive** - provide clear recommendations
-4. **Prioritize productivity** - optimal moisture yields best crops
-5. **Consider sustainability** - but not at cost of farmer's livelihood
-6. **When uncertain about rain** - favor watering to ensure plant health
+2. **Write ALL reasoning in Arabic** - this is for Tunisian women farmers
+3. **Be concise** - reasoning should be 1-2 sentences per field in Arabic
+4. **Be decisive** - provide clear recommendations
+5. **Prioritize productivity** - optimal moisture yields best crops
+6. **Consider sustainability** - but not at cost of farmer's livelihood
+7. **When uncertain about rain** - favor watering to ensure plant health
+8. **Use simple Arabic** - avoid complex vocabulary
 
-Remember: Farmers depend on good yields for their income. Under-watering costs more (in lost production) 
-than moderate water use. Your goal is to make the smartest irrigation decision that ensures HEALTHY, 
-PRODUCTIVE plants while being reasonably efficient with water."""
+Remember: These are Tunisian farmers (mostly women) who depend on good yields for their income. 
+Communicate in clear, respectful Arabic. Under-watering costs more (in lost production) than moderate 
+water use. Your goal is to make the smartest irrigation decision that ensures HEALTHY, PRODUCTIVE plants 
+while being reasonably efficient with water."""
 
     def create_duration_features(self, data: Dict) -> pd.DataFrame:
         """
