@@ -182,6 +182,40 @@ class ApiService {
     }
   }
 
+  /// Request AI irrigation decision with inputs (recommended)
+  Future<Map<String, dynamic>?> getAiDecisionFor(
+    String userId, {
+    required String plantName,
+    required double soilMoisture,
+    double? sensorTemperature,
+    double? sensorHumidity,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'plant_name': plantName,
+        'soil_moisture': soilMoisture,
+      };
+      if (sensorTemperature != null) body['sensor_temperature'] = sensorTemperature;
+      if (sensorHumidity != null) body['sensor_humidity'] = sensorHumidity;
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/farmer/$userId/decision'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        print('Failed to get AI decision (with inputs): ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error getting AI decision (with inputs): $e');
+      return null;
+    }
+  }
+
   /// Health check endpoint
   Future<bool> checkHealth() async {
     try {

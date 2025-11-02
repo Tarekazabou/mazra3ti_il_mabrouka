@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'farm_model.dart';
 import 'demo_controls.dart';
+import 'vegetation_detail_screen.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
@@ -57,6 +58,8 @@ class OverviewScreen extends StatelessWidget {
             onPressed: () async {
               if (farm.farmerId != null) {
                 await farm.loadFarmStateFromApi(farm.farmerId!);
+                // Also refresh AI recommendation to drive the main status card
+                await farm.requestAiDecision();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -389,7 +392,15 @@ class OverviewScreen extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // TODO: Navigate to detail screen for this plant
+        // Navigate to detail screen for this plant (dynamic crops supported)
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VegetationDetailScreen(
+              vegetationName: vegName,
+            ),
+          ),
+        );
       },
       borderRadius: BorderRadius.circular(24),
       child: Container(

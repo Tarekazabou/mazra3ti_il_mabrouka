@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Lazy access to Firestore so constructing this service doesn't require
+  // Firebase.initializeApp() unless a method is actually used.
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
   /// Fetch farmer data by farmer ID
   Future<Map<String, dynamic>?> getFarmerData(String farmerId) async {

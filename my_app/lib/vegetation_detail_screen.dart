@@ -3,12 +3,18 @@ import 'package:provider/provider.dart';
 import 'farm_model.dart';
 
 class VegetationDetailScreen extends StatelessWidget {
-  final VegetationType vegetationType;
+  // Support both old enum-based navigation and new dynamic-name navigation
+  final VegetationType? vegetationType;
+  final String? vegetationName;
 
   const VegetationDetailScreen({
     super.key,
-    required this.vegetationType,
-  });
+    this.vegetationType,
+    this.vegetationName,
+  }) : assert(
+          vegetationType != null || vegetationName != null,
+          'Either vegetationType or vegetationName must be provided',
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -18,25 +24,39 @@ class VegetationDetailScreen extends StatelessWidget {
         extendBodyBehindAppBar: true,
         backgroundColor: const Color(0xFFF0F4F8),
         appBar: AppBar(
-          title: Text(
-            FarmModel.getVegetationName(vegetationType),
-            style: const TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          title: Consumer<FarmModel>(
+            builder: (context, farm, _) {
+              final title = vegetationName != null
+                  ? farm.getVegetationDisplayName(vegetationName!)
+                  : FarmModel.getVegetationName(vegetationType!);
+              return Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
           ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  FarmModel.getVegetationColor(vegetationType),
-                  FarmModel.getVegetationColor(vegetationType).withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+          flexibleSpace: Consumer<FarmModel>(
+            builder: (context, farm, _) {
+              final baseColor = vegetationName != null
+                  ? farm.getVegetationColorForName(vegetationName!)
+                  : FarmModel.getVegetationColor(vegetationType!);
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      baseColor,
+                      baseColor.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              );
+            },
           ),
           elevation: 0,
         ),
@@ -48,6 +68,7 @@ class VegetationDetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Rebuild gradient bar behind the AppBar by inserting a sized box with decoration
                     const SizedBox(height: 100),
                     // Soil Moisture and Pump Status side by side
                     Row(

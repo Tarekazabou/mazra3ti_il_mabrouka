@@ -24,6 +24,11 @@ class FarmModel extends ChangeNotifier {
   String? _farmerId;
   String? _farmerName;
   bool _isLoading = false;
+  // Last AI decision cache to drive main status card
+  Map<String, dynamic>? _lastAiDecision; // contents of 'decision' from backend
+  String? _lastAiReasoning;
+  bool _aiWateringInProgress = false;
+  int? _aiRemainingMinutes;
 
   SoilMoisture get soilMoisture => _soilMoisture;
   PumpStatus get pumpStatus => _pumpStatus;
@@ -342,14 +347,42 @@ class FarmModel extends ChangeNotifier {
   }
 
   /// Request AI decision from backend API
-  Future<Map<String, dynamic>?> requestAiDecision() async {
+  Future<Map<String, dynamic>?> requestAiDecision({String? plantName, double? soilMoisture}) async {
     if (_farmerId == null) return null;
-    
     try {
-      return await _apiService.getAiDecision(_farmerId!);
+      final selectedPlant = plantName ?? (_vegetation.isNotEmpty ? _vegetation.first : 'tomato');
+      final double moisture = soilMoisture ?? _estimateSoilMoisturePercent();
+      final result = await _apiService.getAiDecisionFor(
+        _farmerId!,
+        plantName: selectedPlant,
+        soilMoisture: moisture,
+      );
+
+      // Cache AI result to drive the main status card
+      if (result != null && result['success'] == true) {
+        _aiWateringInProgress = result['watering_in_progress'] == true;
+        _aiRemainingMinutes = result['remaining_minutes'] is int ? result['remaining_minutes'] : null;
+        if (result['decision'] is Map<String, dynamic>) {
+          _lastAiDecision = Map<String, dynamic>.from(result['decision']);
+        }
+        _lastAiReasoning = result['reasoning']?.toString();
+        notifyListeners();
+      }
+      return result;
     } catch (e) {
       print('Error requesting AI decision: $e');
       return null;
+    }
+  }
+
+  double _estimateSoilMoisturePercent() {
+    switch (_soilMoisture) {
+      case SoilMoisture.dry:
+        return 20.0;
+      case SoilMoisture.moderate:
+        return 50.0;
+      case SoilMoisture.wet:
+        return 80.0;
     }
   }
 
@@ -400,6 +433,17 @@ class FarmModel extends ChangeNotifier {
   }
 
   String getMainStatusText() {
+    // Prefer AI recommendation if available
+    if (_aiWateringInProgress) {
+      final mins = _aiRemainingMinutes;
+      return mins != null ? 'الري قيد التنفيذ — متبقٍ $mins دقيقة' : 'الري قيد التنفيذ';
+    }
+    if (_lastAiDecision != null) {
+      final shouldWater = _lastAiDecision!['should_water'] == true;
+      if (shouldWater) return 'اسقِ الآن';
+      return 'لا تسق الآن';
+    }
+    // Fallback to moisture-based static messages
     if (_soilMoisture == SoilMoisture.dry) {
       return "الأرض تحتاج للماء!";
     } else if (_soilMoisture == SoilMoisture.moderate) {
@@ -410,6 +454,23 @@ class FarmModel extends ChangeNotifier {
   }
 
   String getMainStatusSubText() {
+    // Prefer AI details if available
+    if (_aiWateringInProgress) {
+      final mins = _aiRemainingMinutes;
+      return mins != null ? 'عملية الري بدأت بالفعل. المتبقي: $mins دقيقة' : 'عملية الري بدأت بالفعل';
+    }
+    if (_lastAiDecision != null) {
+      final shouldWater = _lastAiDecision!['should_water'] == true;
+      final duration = _lastAiDecision!['duration_minutes'];
+      final intensity = _lastAiDecision!['intensity_percent'];
+      final conf = _lastAiDecision!['confidence'];
+      if (shouldWater) {
+        return 'مدة الري الموصى بها: ${duration ?? '-'} دقيقة • الشدة: ${intensity ?? '-'}% • الثقة: ${((conf ?? 0) * 100).round()}%';
+      }
+      // If not watering, show reasoning if available
+      return _lastAiReasoning ?? 'التربة مناسبة، لا حاجة للري الآن';
+    }
+    // Fallback
     if (_soilMoisture == SoilMoisture.dry) {
       return "شغّل المضخة";
     } else if (_soilMoisture == SoilMoisture.moderate) {
@@ -420,6 +481,15 @@ class FarmModel extends ChangeNotifier {
   }
 
   Color getMainStatusColor() {
+    // Prefer AI signal if available
+    if (_aiWateringInProgress) {
+      return Colors.green;
+    }
+    if (_lastAiDecision != null) {
+      final shouldWater = _lastAiDecision!['should_water'] == true;
+      return shouldWater ? Colors.green : const Color(0xFF00BCD4);
+    }
+    // Fallback to previous logic
     if (_soilMoisture == SoilMoisture.dry) {
       return Colors.red;
     } else if (_soilMoisture == SoilMoisture.moderate) {
@@ -525,7 +595,7 @@ class FarmModel extends ChangeNotifier {
   }
 
   String getPumpImage() {
-    return _pumpStatus == PumpStatus.on 
+    return  _valveStatus == ValveStatus.open 
         ? "assets/images/pump_on.png"
         : "assets/images/pump_off.png";
   }
@@ -608,8 +678,8 @@ class FarmModel extends ChangeNotifier {
       'pepper': 'فلفل',
       'eggplant': 'باذنجان',
       'cucumber': 'خيار',
-      'melon': 'شمام',
-      'watermelon': 'بطيخ',
+      'watermelon': 'شمام',
+      'melon': 'بطيخ',
       'grape': 'عنب',
       'almond': 'لوز',
     };
