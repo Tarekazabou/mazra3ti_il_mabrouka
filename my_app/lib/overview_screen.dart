@@ -82,11 +82,11 @@ class OverviewScreen extends StatelessWidget {
                           width: 110,
                           height: 110,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
+                            color: Colors.black.withOpacity(0.1),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.black.withOpacity(0.1),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
@@ -95,7 +95,7 @@ class OverviewScreen extends StatelessWidget {
                           child: Icon(
                             farm.getMainStatusIcon(),
                             size: 65,
-                            color: Colors.white,
+                            color: Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -103,7 +103,7 @@ class OverviewScreen extends StatelessWidget {
                           farm.getMainStatusText(),
                           style: GoogleFonts.cairo(
                             fontSize: 34,
-                            color: Colors.white,
+                            color: Colors.black87,
                             fontWeight: FontWeight.bold,
                             height: 1.2,
                           ),
@@ -116,14 +116,14 @@ class OverviewScreen extends StatelessWidget {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.black.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             farm.getMainStatusSubText(),
                             style: GoogleFonts.cairo(
                               fontSize: 18,
-                              color: Colors.white,
+                              color: Colors.black87,
                               fontWeight: FontWeight.w600,
                             ),
                             textAlign: TextAlign.center,
@@ -326,7 +326,7 @@ class OverviewScreen extends StatelessWidget {
   }) {
     final color = FarmModel.getVegetationColor(type);
     final name = FarmModel.getVegetationName(type);
-    final icon = FarmModel.getVegetationIcon(type);
+    final imagePath = FarmModel.getVegetationImage(type);
     
     return InkWell(
       onTap: () {
@@ -339,7 +339,7 @@ class OverviewScreen extends StatelessWidget {
       },
       borderRadius: BorderRadius.circular(24),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -353,31 +353,40 @@ class OverviewScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Image container similar to main page tiles
             Container(
-              width: 70,
-              height: 70,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    color,
-                    color.withOpacity(0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 36,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback to icon if image not found
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            color,
+                            color.withOpacity(0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Icon(
+                        FarmModel.getVegetationIcon(type),
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(width: 20),

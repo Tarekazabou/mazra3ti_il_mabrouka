@@ -381,6 +381,17 @@ class FarmModel extends ChangeNotifier {
     }
   }
 
+  static String getVegetationImage(VegetationType type) {
+    switch (type) {
+      case VegetationType.potato:
+        return "assets/images/potato.png";
+      case VegetationType.tomato:
+        return "assets/images/tomato.png";
+      case VegetationType.onion:
+        return "assets/images/onion.png";
+    }
+  }
+
   // Dynamic vegetation methods (from Firebase)
   
   /// Get display name for dynamic vegetation from Firebase

@@ -49,23 +49,29 @@ class VegetationDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 100),
-                    // Soil Moisture Status
-                    _buildInfoTile(
-                      title: 'رطوبة التربة',
-                      imagePath: farm.getSoilMoistureImage(),
-                      value: farm.getSoilMoistureText(),
-                      color: farm.getMainStatusColor(),
-                      icon: Icons.water_drop,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Pump Status
-                    _buildInfoTile(
-                      title: 'المضخة',
-                      imagePath: farm.getPumpImage(),
-                      value: farm.getPumpStatusText(),
-                      color: farm.getPumpStatusColor(),
-                      icon: Icons.water,
+                    // Soil Moisture and Pump Status side by side
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoTile(
+                            title: 'رطوبة التربة',
+                            imagePath: farm.getSoilMoistureImage(),
+                            value: farm.getSoilMoistureText(),
+                            color: farm.getMainStatusColor(),
+                            icon: Icons.water_drop,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildInfoTile(
+                            title: 'المضخة',
+                            imagePath: farm.getPumpImage(),
+                            value: farm.getPumpStatusText(),
+                            color: farm.getPumpStatusColor(),
+                            icon: Icons.water,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 32),
 
@@ -123,78 +129,79 @@ class VegetationDetailScreen extends StatelessWidget {
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.15),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 15,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // Image
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withOpacity(0.2),
-                  color.withOpacity(0.1),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Icon(icon, size: 45, color: color),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(width: 20),
-          // Text content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black54,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Cartoon Image
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to icon if image not found
+                      return Center(
+                        child: Icon(icon, size: 30, color: Colors.grey),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                    height: 1.2,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            // Title
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            // Value
+            Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
