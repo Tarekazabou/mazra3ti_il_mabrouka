@@ -5,6 +5,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'farm_model.dart';
+import 'voice_chat_config.dart';
 
 /// Widget showing vegetation with LiveKit + Gemini voice chat (Arabic only)
 class VegetationDisplayWidget extends StatefulWidget {
@@ -47,28 +48,18 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
   /// Initialize Gemini AI with Arabic language support
   void _initializeGemini() {
     try {
-      // Get API key from environment or use a placeholder
-      // In production, this should come from secure storage or env variables
-      const apiKey = String.fromEnvironment('GEMINI_API_KEY', 
-          defaultValue: 'YOUR_GEMINI_API_KEY_HERE');
+      // Check if configuration is valid
+      if (!VoiceChatConfig.isConfigured()) {
+        setState(() {
+          _statusMessage = VoiceChatConfig.getConfigStatusMessage();
+        });
+        return;
+      }
       
       _geminiModel = GenerativeModel(
-        model: 'gemini-2.0-flash',
-        apiKey: apiKey,
-        systemInstruction: Content.system('''أنت مساعد زراعي ذكي متخصص في المزارع التونسية.
-دورك هو مساعدة المزارعين في:
-- معرفة حالة النباتات المزروعة
-- تقديم نصائح للري والعناية بالنباتات
-- الإجابة عن أسئلة حول الزراعة
-
-قواعد مهمة:
-1. استخدم اللغة العربية فقط في جميع الردود
-2. كن واضحاً ومباشراً
-3. استخدم لغة بسيطة يفهمها المزارعون
-4. قدم معلومات عملية ومفيدة
-5. كن مشجعاً وإيجابياً
-
-عند سؤالك عن النباتات، استخدم المعلومات المتاحة من المزرعة.'''),
+        model: VoiceChatConfig.geminiModel,
+        apiKey: VoiceChatConfig.geminiApiKey,
+        systemInstruction: Content.system(VoiceChatConfig.geminiSystemInstruction),
       );
       
       _chatSession = _geminiModel!.startChat();
@@ -105,14 +96,11 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
       // Set up event listeners
       _room!.addListener(_onRoomUpdate);
       
-      // Connect to LiveKit server
-      // In production, get these values from your LiveKit server
-      const wsUrl = String.fromEnvironment('LIVEKIT_URL', 
-          defaultValue: 'wss://your-livekit-server.com');
-      const token = String.fromEnvironment('LIVEKIT_TOKEN',
-          defaultValue: 'YOUR_LIVEKIT_TOKEN_HERE');
-      
-      await _room!.connect(wsUrl, token);
+      // Connect to LiveKit server using configuration
+      await _room!.connect(
+        VoiceChatConfig.livekitUrl,
+        VoiceChatConfig.livekitToken,
+      );
       
       // Enable microphone
       await _room!.localParticipant?.setMicrophoneEnabled(true);
