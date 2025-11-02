@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'firebase_service.dart';
+import 'api_service.dart';
 
 enum SoilMoisture { dry, moderate, wet }
 enum PumpStatus { on, off }
@@ -11,6 +12,7 @@ enum VegetationType { potato, tomato, onion }
 
 class FarmModel extends ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
+  final ApiService _apiService = ApiService();
   
   SoilMoisture _soilMoisture = SoilMoisture.moderate;
   PumpStatus _pumpStatus = PumpStatus.off;
@@ -170,6 +172,165 @@ class FarmModel extends ChangeNotifier {
           : ValveStatus.closed;
     }
   }
+
+  // ===== BACKEND API METHODS =====
+
+  /// Load farm state from backend API
+  Future<void> loadFarmStateFromApi(String farmerId) async {
+    _isLoading = true;
+    _farmerId = farmerId;
+    notifyListeners();
+
+    try {
+      final farmState = await _apiService.getFarmState(farmerId);
+      if (farmState != null && farmState['success'] == true) {
+        // Update farmer info
+        if (farmState['user'] != null) {
+          _farmerName = farmState['user']['name'] as String?;
+        }
+
+        // Update vegetation from plants
+        if (farmState['plants'] is List) {
+          _vegetation = (farmState['plants'] as List)
+              .map((p) => p['name'].toString())
+              .toList();
+        }
+
+        // Update valve status
+        if (farmState['valve'] != null) {
+          final valve = farmState['valve'];
+          _valveStatus = valve['is_watering'] == true 
+              ? ValveStatus.open 
+              : ValveStatus.closed;
+          
+          if (valve['mode'] == 'manual') {
+            _controlMode = ControlMode.manual;
+          } else {
+            _controlMode = ControlMode.automatic;
+          }
+        }
+
+        // Update AI mode
+        if (farmState['ai_mode'] != null) {
+          _controlMode = farmState['ai_mode'] == true 
+              ? ControlMode.automatic 
+              : ControlMode.manual;
+        }
+
+        // Update weather data
+        if (farmState['weather'] != null) {
+          final weather = farmState['weather'];
+          // You can extend this to parse weather alerts
+          // For now, we'll keep the existing Firebase-based weather
+        }
+
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error loading farm state from API: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Open valve via backend API
+  Future<bool> openValveViaApi(String plantName, int durationMinutes) async {
+    if (_farmerId == null) return false;
+    
+    try {
+      final result = await _apiService.openValve(
+        _farmerId!, 
+        plantName, 
+        durationMinutes,
+      );
+      
+      if (result != null && result['success'] == true) {
+        _valveStatus = ValveStatus.open;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error opening valve via API: $e');
+      return false;
+    }
+  }
+
+  /// Close valve via backend API
+  Future<bool> closeValveViaApi() async {
+    if (_farmerId == null) return false;
+    
+    try {
+      final result = await _apiService.closeValve(_farmerId!);
+      
+      if (result != null && result['success'] == true) {
+        _valveStatus = ValveStatus.closed;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error closing valve via API: $e');
+      return false;
+    }
+  }
+
+  /// Toggle AI mode via backend API
+  Future<bool> toggleAiModeViaApi(bool enabled) async {
+    if (_farmerId == null) return false;
+    
+    try {
+      final result = await _apiService.toggleAiMode(_farmerId!, enabled);
+      
+      if (result != null && result['success'] == true) {
+        _controlMode = enabled ? ControlMode.automatic : ControlMode.manual;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error toggling AI mode via API: $e');
+      return false;
+    }
+  }
+
+  /// Get irrigation history from backend API
+  Future<List<Map<String, dynamic>>> getHistoryFromApi({int limit = 10}) async {
+    if (_farmerId == null) return [];
+    
+    try {
+      return await _apiService.getHistory(_farmerId!, limit: limit);
+    } catch (e) {
+      print('Error getting history from API: $e');
+      return [];
+    }
+  }
+
+  /// Request AI decision from backend API
+  Future<Map<String, dynamic>?> requestAiDecision() async {
+    if (_farmerId == null) return null;
+    
+    try {
+      return await _apiService.getAiDecision(_farmerId!);
+    } catch (e) {
+      print('Error requesting AI decision: $e');
+      return null;
+    }
+  }
+
+  /// Check if backend is available
+  Future<bool> checkBackendHealth() async {
+    try {
+      return await _apiService.checkHealth();
+    } catch (e) {
+      print('Error checking backend health: $e');
+      return false;
+    }
+  }
+
+  // ===== END BACKEND API METHODS =====
+
 
   SoilMoisture _parseSoilMoisture(String value) {
     switch (value.toLowerCase()) {
