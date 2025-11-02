@@ -1,0 +1,364 @@
+# WiEmpower Backend - Self-Contained
+
+This folder contains **everything** needed to run the WiEmpower Smart Irrigation backend. It's completely self-contained and can be deployed as a single unit.
+
+## 📁 Structure
+
+```
+backend/
+├── app.py                  # Main Flask application
+├── models/                 # XGBoost trained models
+│   ├── model_should_water.pkl
+│   ├── model_intensity.pkl
+│   ├── model_duration.pkl
+│   └── duration_features.pkl
+├── data/                   # Plant database
+│   └── tunisia_crops_full.json
+├── services/               # Business logic
+│   ├── admin_service.py
+│   ├── farmer_service.py
+│   ├── irrigation_service.py
+│   ├── valve_service.py
+│   ├── weather_service.py
+│   └── plant_service.py
+├── routes/                 # HTTP endpoints
+│   ├── admin_routes.py
+│   └── farmer_routes.py
+├── utils/                  # Shared utilities
+│   ├── firebase_client.py
+│   ├── forecast.py
+│   └── gemini_decision.py
+├── .env                    # Environment variables
+├── wieempower-...-firebase-adminsdk-....json  # Firebase credentials
+└── test_backend_self_contained.py  # Test script
+```
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
+
+```bash
+pip install flask flask-cors firebase-admin requests google-generativeai xgboost joblib pandas numpy
+```
+
+### 2. Set Environment Variables
+
+The `.env` file should contain:
+
+```
+GEMINI_API_KEY=your-gemini-api-key
+WEATHER_API_KEY=your-weather-api-key
+```
+
+### 3. Run the Backend
+
+```bash
+cd backend
+python app.py
+```
+
+Server runs on `http://0.0.0.0:5000`
+
+### 4. Test the Backend
+
+```bash
+cd backend
+python test_backend_self_contained.py
+```
+
+Expected output:
+
+```
+✅ All required files present!
+✅ All services import correctly
+✅ Firebase connected
+✅ Loaded 30 plants from database
+✅ Weather API working
+```
+
+## 📡 API Endpoints
+
+### Farmer Interface (`/api/farmer/<user_id>/`)
+
+For mobile app - women farmers like Mabrouka:
+
+- **GET /state** - Get complete farm state (plants, weather, valve status, AI mode)
+- **POST /valve/open** - Manually open valve for watering
+- **POST /valve/close** - Manually close valve
+- **GET /valve/status** - Check if valve is open/closed
+- **POST /ai-mode** - Toggle AI automatic mode on/off
+- **POST /decision** - Get AI irrigation decision (called by scheduler)
+- **GET /history** - View past irrigation decisions
+- **GET /plants** - List user's plants
+
+### Admin Interface (`/api/admin/`)
+
+For system management:
+
+- **GET /users** - List all users
+- **POST /users** - Add new user with soil properties and plants
+- **GET /users/<id>** - Get user details
+- **PUT /users/<id>** - Update user details
+- **DELETE /users/<id>** - Delete user
+- **POST /users/<id>/plants** - Add plant to user
+- **DELETE /users/<id>/plants/<name>** - Remove plant from user
+- **GET /plants** - List all available plants
+- **GET /stats** - System statistics
+
+## 🔄 How It Works
+
+```
+Mobile App (Mabrouka)
+        ↓
+  Farmer API (/api/farmer/<user_id>/)
+        ↓
+  Routes (farmer_routes.py)
+        ↓
+  Services (farmer_service.py, valve_service.py, etc.)
+        ↓
+  Firebase + Weather API + XGBoost + Gemini AI
+```
+
+## 🎯 Key Features
+
+### 1. **Watering State Tracking**
+
+- Prevents overlapping irrigation runs
+- Half-hourly scheduler checks if watering in progress
+- Auto-clears expired watering states
+
+### 2. **AI Mode Toggle**
+
+- Farmer chooses: AI automatic OR manual-only
+- When AI mode OFF → only manual control
+- When AI mode ON → scheduler makes automatic decisions
+
+### 3. **Manual Override**
+
+- Farmer can ALWAYS open/close valve manually
+- Works even in AI mode (farmer has control)
+- All actions logged with mode ("ai" or "manual")
+
+### 4. **Smart AI Decisions**
+
+- XGBoost models predict: should_water, duration, intensity
+- Gemini LLM refines decision using weather forecast
+- Considers rain probability to conserve water
+- Prioritizes plant health and productivity
+
+## 📊 Firebase Collections
+
+### users/
+
+```json
+{
+  "email": "mabrouka@farm.tn",
+  "name": "Mabrouka",
+  "location": "Zaghouan",
+  "soil_properties": {
+    "soil_type": "loam",
+    "soil_type_encoded": 2,
+    "soil_compaction": 55,
+    "slope_degrees": 3.5
+  },
+  "plants": [
+    {
+      "name": "tomato",
+      "area_sqm": 100,
+      "features": { ... }
+    }
+  ],
+  "ai_mode": true,
+  "watering_state": {
+    "is_watering": false,
+    "plant_name": "",
+    "start_time": "",
+    "expected_end": "",
+    "mode": "ai"
+  },
+  "last_watering": "2025-11-02T10:30:00"
+}
+```
+
+### irrigation_logs/
+
+```json
+{
+  "user_id": "abc123",
+  "plant_name": "tomato",
+  "timestamp": "2025-11-02T10:30:00",
+  "action": "decision",
+  "decision": {
+    "should_water": true,
+    "duration_minutes": 30,
+    "intensity_percent": 70
+  },
+  "reasoning": "...",
+  "mode": "ai"
+}
+```
+
+### plant_database/
+
+Custom plants generated by Gemini AI (cached for reuse)
+
+## 🔧 Development
+
+### Running Tests
+
+```bash
+cd backend
+python test_backend_self_contained.py
+```
+
+### Adding New Endpoints
+
+1. Add business logic to appropriate service in `services/`
+2. Add HTTP endpoint to appropriate route in `routes/`
+3. Test with curl or Postman
+
+### Modifying AI Logic
+
+- **XGBoost models**: Located in `models/`, retrain using parent `train_xgboost.py`
+- **Gemini reasoning**: Edit `utils/gemini_decision.py`
+- **Weather integration**: Edit `utils/forecast.py`
+
+## 🚢 Deployment
+
+### Option 1: Docker
+
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY backend/ /app/
+
+RUN pip install flask flask-cors firebase-admin requests google-generativeai xgboost joblib pandas numpy
+
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+### Option 2: Cloud Platform (Heroku, Railway, etc.)
+
+1. Copy entire `backend/` folder
+2. Add `Procfile`: `web: python app.py`
+3. Add `requirements.txt`
+4. Deploy
+
+### Option 3: VPS
+
+```bash
+# Upload backend/ folder to server
+scp -r backend/ user@server:/var/www/wieempower/
+
+# On server
+cd /var/www/wieempower/backend
+pip install -r requirements.txt
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+## 🔒 Security Notes
+
+For production:
+
+1. **Set DEBUG=False** in `app.py`
+2. **Use environment variables** for all secrets
+3. **Add authentication** to admin endpoints
+4. **Enable HTTPS** (use nginx reverse proxy)
+5. **Rate limiting** for API endpoints
+6. **Validate all inputs** (already done in services)
+
+## 📝 Environment Variables
+
+Required in `.env`:
+
+```bash
+# Gemini AI API Key (for smart decisions)
+GEMINI_API_KEY=your-gemini-api-key-here
+
+# Weather API Key (WeatherAPI.com)
+WEATHER_API_KEY=your-weather-api-key-here
+
+# Optional: Flask settings
+FLASK_ENV=production
+FLASK_DEBUG=False
+```
+
+## 🧪 Testing Checklist
+
+Before deployment:
+
+- [x] All services import correctly
+- [x] Firebase connection works
+- [x] Plant database loads (30 plants)
+- [x] Weather API returns data
+- [x] XGBoost models load successfully
+- [ ] Gemini API key configured (optional)
+- [ ] Test farmer endpoints with curl
+- [ ] Test admin endpoints with curl
+- [ ] Test manual valve control
+- [ ] Test AI decision making
+
+## 📱 Mobile App Integration
+
+The mobile app should call farmer endpoints:
+
+```javascript
+// Get farm state (home screen)
+const response = await fetch(`/api/farmer/${userId}/state`);
+const farmState = await response.json();
+
+// Manual water control
+await fetch(`/api/farmer/${userId}/valve/open`, {
+  method: "POST",
+  body: JSON.stringify({ plant_name: "tomato", duration_minutes: 30 }),
+});
+```
+
+See `API_DOCUMENTATION.md` for complete examples.
+
+## 🆘 Troubleshooting
+
+### "Module not found" errors
+
+```bash
+# Make sure you're in backend/ directory
+cd backend
+python app.py
+```
+
+### Firebase connection fails
+
+- Check `wieempower-...-firebase-adminsdk-....json` exists in backend/
+- Verify Firebase project is active
+
+### Weather API not working
+
+- Check `.env` has `WEATHER_API_KEY`
+- Test: https://api.weatherapi.com/v1/current.json?key=YOUR_KEY&q=Tunis
+
+### XGBoost models not loading
+
+- Verify all `.pkl` files in `backend/models/`
+- Check file permissions
+
+## 📚 Additional Documentation
+
+- `API_DOCUMENTATION.md` - Complete API reference with examples
+- `README.md` (parent) - Overall project documentation
+- `IMPLEMENTATION_COMPLETE.md` - Architecture and implementation details
+
+## 👥 Support
+
+For questions about the backend:
+
+1. Check `API_DOCUMENTATION.md` first
+2. Run `test_backend_self_contained.py` to diagnose issues
+3. Review service code in `services/` folder
+
+---
+
+**Built for women farmers in Tunisia 🇹🇳 🌱**
+
+Backend is completely self-contained - just copy the folder and run!
