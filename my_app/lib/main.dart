@@ -20,8 +20,21 @@ void main() async {
       create: (context) {
         final model = FarmModel();
         // TODO: Replace with actual farmer ID from login
+        // 
+        // FIREBASE ONLY (original):
         // For testing, you can use: model.loadFarmerData('YOUR_FARMER_ID');
         // Or listen to real-time updates: model.listenToMeasurements('YOUR_FARMER_ID');
+        //
+        // BACKEND API (new - connects to Flask backend):
+        // For testing: model.loadFarmStateFromApi('YOUR_FARMER_ID');
+        // To check backend health: model.checkBackendHealth();
+        // To open valve: model.openValveViaApi('tomato', 30);
+        // To close valve: model.closeValveViaApi();
+        // To toggle AI mode: model.toggleAiModeViaApi(true);
+        //
+        // IMPORTANT: Update the baseUrl in lib/api_service.dart to point to your backend
+        // For local testing: http://localhost:5000
+        // For production: Update with your deployed backend URL
         return model;
       },
       child: const MyApp(),
