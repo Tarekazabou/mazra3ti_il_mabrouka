@@ -1,0 +1,452 @@
+{
+  "wheat_durum": {
+    "arabic_name": "قمح صلب",
+    "category": "cereal",
+    "water_requirement_level": 3,
+    "root_depth_cm": 150,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      45,
+      65
+    ],
+    "critical_moisture_threshold": 30,
+    "growing_season": "winter",
+    "cultivation_area_ha": 500000,
+    "notes": "Tunisia's main cereal crop, drought-resistant"
+  },
+  "wheat_soft": {
+    "arabic_name": "قمح لين",
+    "category": "cereal",
+    "water_requirement_level": 3,
+    "root_depth_cm": 140,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      45,
+      65
+    ],
+    "critical_moisture_threshold": 30,
+    "growing_season": "winter",
+    "cultivation_area_ha": 300000,
+    "notes": "Bread wheat, common in northern regions"
+  },
+  "barley": {
+    "arabic_name": "شعير",
+    "category": "cereal",
+    "water_requirement_level": 2,
+    "root_depth_cm": 120,
+    "drought_tolerance": 4,
+    "optimal_moisture_range": [
+      40,
+      60
+    ],
+    "critical_moisture_threshold": 25,
+    "growing_season": "winter",
+    "cultivation_area_ha": 400000,
+    "notes": "Very drought-resistant, animal feed"
+  },
+  "tomato": {
+    "arabic_name": "طماطم",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 60,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      80
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 25000,
+    "notes": "Major export crop, greenhouse and field"
+  },
+  "potato": {
+    "arabic_name": "بطاطا",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 60,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      55,
+      75
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 30000,
+    "notes": "Multiple seasons, important staple"
+  },
+  "pepper_sweet": {
+    "arabic_name": "فلفل حلو",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 50,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      55,
+      75
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 15000,
+    "notes": "Popular in Tunisian markets"
+  },
+  "pepper_hot": {
+    "arabic_name": "فلفل حار",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 50,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 8000,
+    "notes": "Harissa production, export crop"
+  },
+  "onion": {
+    "arabic_name": "بصل",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 30,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "winter-spring",
+    "cultivation_area_ha": 12000,
+    "notes": "Important for local consumption"
+  },
+  "garlic": {
+    "arabic_name": "ثوم",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 30,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "fall-spring",
+    "cultivation_area_ha": 5000,
+    "notes": "High-value crop"
+  },
+  "carrot": {
+    "arabic_name": "جزر",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 40,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "fall-spring",
+    "cultivation_area_ha": 6000,
+    "notes": "Cool season crop"
+  },
+  "cucumber": {
+    "arabic_name": "خيار",
+    "category": "vegetable",
+    "water_requirement_level": 5,
+    "root_depth_cm": 90,
+    "drought_tolerance": 1,
+    "optimal_moisture_range": [
+      70,
+      85
+    ],
+    "critical_moisture_threshold": 50,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 8000,
+    "notes": "High water needs, greenhouse common"
+  },
+  "zucchini": {
+    "arabic_name": "كوسا",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 60,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 10000,
+    "notes": "Popular summer vegetable"
+  },
+  "eggplant": {
+    "arabic_name": "باذنجان",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 75,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "spring-summer",
+    "cultivation_area_ha": 7000,
+    "notes": "Heat-loving, common in Tunisia"
+  },
+  "lettuce": {
+    "arabic_name": "خس",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 25,
+    "drought_tolerance": 1,
+    "optimal_moisture_range": [
+      60,
+      75
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "fall-spring",
+    "cultivation_area_ha": 4000,
+    "notes": "Cool season, high water needs"
+  },
+  "cabbage": {
+    "arabic_name": "ملفوف",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 50,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      55,
+      70
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "fall-winter",
+    "cultivation_area_ha": 5000,
+    "notes": "Cool season crop"
+  },
+  "cauliflower": {
+    "arabic_name": "قرنبيط",
+    "category": "vegetable",
+    "water_requirement_level": 4,
+    "root_depth_cm": 50,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      75
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "fall-winter",
+    "cultivation_area_ha": 4000,
+    "notes": "Export quality important"
+  },
+  "turnip": {
+    "arabic_name": "لفت",
+    "category": "vegetable",
+    "water_requirement_level": 3,
+    "root_depth_cm": 40,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "fall-spring",
+    "cultivation_area_ha": 3000,
+    "notes": "Traditional Tunisian crop"
+  },
+  "peas": {
+    "arabic_name": "بازلاء",
+    "category": "legume",
+    "water_requirement_level": 3,
+    "root_depth_cm": 60,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      55,
+      70
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "winter-spring",
+    "cultivation_area_ha": 8000,
+    "notes": "Nitrogen-fixing, important legume"
+  },
+  "fava_bean": {
+    "arabic_name": "فول",
+    "category": "legume",
+    "water_requirement_level": 3,
+    "root_depth_cm": 80,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "winter-spring",
+    "cultivation_area_ha": 35000,
+    "notes": "Major protein source, very common"
+  },
+  "chickpea": {
+    "arabic_name": "حمص",
+    "category": "legume",
+    "water_requirement_level": 2,
+    "root_depth_cm": 100,
+    "drought_tolerance": 4,
+    "optimal_moisture_range": [
+      40,
+      60
+    ],
+    "critical_moisture_threshold": 30,
+    "growing_season": "winter",
+    "cultivation_area_ha": 20000,
+    "notes": "Drought-resistant, traditional crop"
+  },
+  "melon": {
+    "arabic_name": "بطيخ أصفر",
+    "category": "fruit",
+    "water_requirement_level": 4,
+    "root_depth_cm": 150,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      65,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "summer",
+    "cultivation_area_ha": 15000,
+    "notes": "Important summer crop"
+  },
+  "watermelon": {
+    "arabic_name": "دلاع",
+    "category": "fruit",
+    "water_requirement_level": 4,
+    "root_depth_cm": 180,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      65,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "summer",
+    "cultivation_area_ha": 20000,
+    "notes": "Very popular in Tunisia"
+  },
+  "strawberry": {
+    "arabic_name": "فراولة",
+    "category": "fruit",
+    "water_requirement_level": 4,
+    "root_depth_cm": 25,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      75
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "winter-spring",
+    "cultivation_area_ha": 2000,
+    "notes": "High-value export crop"
+  },
+  "olive": {
+    "arabic_name": "زيتون",
+    "category": "tree",
+    "water_requirement_level": 2,
+    "root_depth_cm": 250,
+    "drought_tolerance": 5,
+    "optimal_moisture_range": [
+      35,
+      55
+    ],
+    "critical_moisture_threshold": 20,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 1800000,
+    "notes": "Tunisia's #1 crop, very drought-resistant"
+  },
+  "date_palm": {
+    "arabic_name": "نخيل التمر",
+    "category": "tree",
+    "water_requirement_level": 4,
+    "root_depth_cm": 300,
+    "drought_tolerance": 3,
+    "optimal_moisture_range": [
+      50,
+      70
+    ],
+    "critical_moisture_threshold": 35,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 50000,
+    "notes": "Oasis agriculture, southern Tunisia"
+  },
+  "mint": {
+    "arabic_name": "نعناع",
+    "category": "herb",
+    "water_requirement_level": 5,
+    "root_depth_cm": 40,
+    "drought_tolerance": 1,
+    "optimal_moisture_range": [
+      65,
+      85
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 1000,
+    "notes": "Tea culture, continuous harvest"
+  },
+  "parsley": {
+    "arabic_name": "معدنوس",
+    "category": "herb",
+    "water_requirement_level": 4,
+    "root_depth_cm": 30,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      75
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 500,
+    "notes": "Common kitchen herb"
+  },
+  "coriander": {
+    "arabic_name": "كزبرة",
+    "category": "herb",
+    "water_requirement_level": 3,
+    "root_depth_cm": 30,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      55,
+      70
+    ],
+    "critical_moisture_threshold": 40,
+    "growing_season": "fall-spring",
+    "cultivation_area_ha": 800,
+    "notes": "Popular in Tunisian cuisine"
+  },
+  "orange": {
+    "arabic_name": "بُرتقال",
+    "category": "tree",
+    "water_requirement_level": 4,
+    "root_depth_cm": 150,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 20000,
+    "notes": "Cap Bon region specialty"
+  },
+  "lemon": {
+    "arabic_name": "ليمون",
+    "category": "tree",
+    "water_requirement_level": 4,
+    "root_depth_cm": 150,
+    "drought_tolerance": 2,
+    "optimal_moisture_range": [
+      60,
+      80
+    ],
+    "critical_moisture_threshold": 45,
+    "growing_season": "year-round",
+    "cultivation_area_ha": 5000,
+    "notes": "Year-round production"
+  }
+}

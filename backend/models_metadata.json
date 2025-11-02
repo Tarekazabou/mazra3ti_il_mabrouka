@@ -1,0 +1,87 @@
+{
+  "model_version": "1.0_enhanced",
+  "training_date": "2025-11-01 23:49:48",
+  "training_samples": 20000,
+  "test_samples": 5000,
+  "base_features": [
+    "soil_moisture",
+    "current_temperature",
+    "current_humidity",
+    "minutes_since_last_watering",
+    "water_requirement_level",
+    "root_depth_cm",
+    "drought_tolerance",
+    "soil_type_encoded",
+    "soil_compaction",
+    "slope_degrees",
+    "hour_of_day",
+    "day_of_year",
+    "season"
+  ],
+  "duration_features": [
+    "soil_moisture",
+    "current_temperature",
+    "current_humidity",
+    "minutes_since_last_watering",
+    "water_requirement_level",
+    "root_depth_cm",
+    "drought_tolerance",
+    "soil_type_encoded",
+    "soil_compaction",
+    "slope_degrees",
+    "hour_of_day",
+    "day_of_year",
+    "season",
+    "moisture_deficit",
+    "water_stress",
+    "et_factor",
+    "root_moisture_need",
+    "watering_urgency",
+    "soil_retention",
+    "drought_stress",
+    "optimal_time",
+    "seasonal_demand",
+    "infiltration_factor",
+    "runoff_risk"
+  ],
+  "models": {
+    "should_water": {
+      "type": "classification",
+      "file": "model_should_water.pkl",
+      "features": "base_features",
+      "accuracy": 0.9958,
+      "precision": 0.9982595723520636,
+      "recall": 0.9965251923554231,
+      "f1_score": 0.9973916283691467
+    },
+    "duration": {
+      "type": "regression",
+      "file": "model_duration.pkl",
+      "features_file": "duration_features.pkl",
+      "mae": 1.871059775352478,
+      "rmse": 3.086376149352267,
+      "r2_score": 0.9915962219238281,
+      "within_5min_accuracy": 96.62447257383965,
+      "within_10min_accuracy": 99.47877885331347,
+      "output_range": [
+        5,
+        90
+      ],
+      "unit": "minutes",
+      "enhanced": true
+    },
+    "intensity": {
+      "type": "regression",
+      "file": "model_intensity.pkl",
+      "features": "base_features",
+      "mae": 17.214279174804688,
+      "rmse": 22.149670655706146,
+      "r2_score": -0.0494612455368042,
+      "output_range": [
+        20,
+        100
+      ],
+      "unit": "percent"
+    }
+  }
+}
