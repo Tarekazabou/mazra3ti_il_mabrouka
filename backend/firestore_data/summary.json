@@ -1,0 +1,122 @@
+{
+  "generated_at": "2025-11-02T07:13:13.869639",
+  "total_users": 10,
+  "users": [
+    {
+      "user_id": "mabrouka_1002dfc1",
+      "name": "Mabrouka",
+      "email": "mabrouka@farm.tn",
+      "location": "Ben Arous",
+      "plants": [
+        "wheat",
+        "onion",
+        "melon"
+      ]
+    },
+    {
+      "user_id": "fatma_62165644",
+      "name": "Fatma",
+      "email": "fatma@farm.tn",
+      "location": "Monastir",
+      "plants": [
+        "wheat",
+        "citrus",
+        "eggplant",
+        "barley",
+        "tomato"
+      ]
+    },
+    {
+      "user_id": "aicha_5204363a",
+      "name": "Aicha",
+      "email": "aicha@farm.tn",
+      "location": "Nabeul",
+      "plants": [
+        "melon",
+        "citrus"
+      ]
+    },
+    {
+      "user_id": "khadija_4c319fe7",
+      "name": "Khadija",
+      "email": "khadija@farm.tn",
+      "location": "Sousse",
+      "plants": [
+        "date_palm",
+        "barley"
+      ]
+    },
+    {
+      "user_id": "zahra_abe68881",
+      "name": "Zahra",
+      "email": "zahra@farm.tn",
+      "location": "Tunis",
+      "plants": [
+        "citrus",
+        "date_palm",
+        "barley"
+      ]
+    },
+    {
+      "user_id": "amina_657cdff1",
+      "name": "Amina",
+      "email": "amina@farm.tn",
+      "location": "Tataouine",
+      "plants": [
+        "almond",
+        "cucumber",
+        "citrus",
+        "onion",
+        "barley"
+      ]
+    },
+    {
+      "user_id": "salma_98736841",
+      "name": "Salma",
+      "email": "salma@farm.tn",
+      "location": "Ariana",
+      "plants": [
+        "onion",
+        "cucumber"
+      ]
+    },
+    {
+      "user_id": "nadia_4d3fefd8",
+      "name": "Nadia",
+      "email": "nadia@farm.tn",
+      "location": "Kairouan",
+      "plants": [
+        "watermelon",
+        "cucumber",
+        "olive",
+        "potato"
+      ]
+    },
+    {
+      "user_id": "leila_01dcae1a",
+      "name": "Leila",
+      "email": "leila@farm.tn",
+      "location": "Sousse",
+      "plants": [
+        "eggplant",
+        "olive"
+      ]
+    },
+    {
+      "user_id": "samira_b3d81d2b",
+      "name": "Samira",
+      "email": "samira@farm.tn",
+      "location": "Tunis",
+      "plants": [
+        "onion",
+        "cucumber",
+        "citrus"
+      ]
+    }
+  ],
+  "collections": {
+    "users": 10,
+    "farmers": 10,
+    "measurements": 10
+  }
+}

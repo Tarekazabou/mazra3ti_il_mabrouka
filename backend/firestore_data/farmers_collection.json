@@ -1,0 +1,133 @@
+{
+  "mabrouka_1002dfc1": {
+    "farmerId": "mabrouka_1002dfc1",
+    "name": "Mabrouka",
+    "email": "mabrouka@farm.tn",
+    "location": "Ben Arous",
+    "vegetation": [
+      "wheat",
+      "onion",
+      "melon"
+    ],
+    "created_at": "2025-11-02T07:13:13.866756",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.866757"
+  },
+  "fatma_62165644": {
+    "farmerId": "fatma_62165644",
+    "name": "Fatma",
+    "email": "fatma@farm.tn",
+    "location": "Monastir",
+    "vegetation": [
+      "wheat",
+      "citrus",
+      "eggplant",
+      "barley",
+      "tomato"
+    ],
+    "created_at": "2025-11-02T07:13:13.866907",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.866909"
+  },
+  "aicha_5204363a": {
+    "farmerId": "aicha_5204363a",
+    "name": "Aicha",
+    "email": "aicha@farm.tn",
+    "location": "Nabeul",
+    "vegetation": [
+      "melon",
+      "citrus"
+    ],
+    "created_at": "2025-11-02T07:13:13.866996",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.866998"
+  },
+  "khadija_4c319fe7": {
+    "farmerId": "khadija_4c319fe7",
+    "name": "Khadija",
+    "email": "khadija@farm.tn",
+    "location": "Sousse",
+    "vegetation": [
+      "date_palm",
+      "barley"
+    ],
+    "created_at": "2025-11-02T07:13:13.867094",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867096"
+  },
+  "zahra_abe68881": {
+    "farmerId": "zahra_abe68881",
+    "name": "Zahra",
+    "email": "zahra@farm.tn",
+    "location": "Tunis",
+    "vegetation": [
+      "citrus",
+      "date_palm",
+      "barley"
+    ],
+    "created_at": "2025-11-02T07:13:13.867194",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867196"
+  },
+  "amina_657cdff1": {
+    "farmerId": "amina_657cdff1",
+    "name": "Amina",
+    "email": "amina@farm.tn",
+    "location": "Tataouine",
+    "vegetation": [
+      "almond",
+      "cucumber",
+      "citrus",
+      "onion",
+      "barley"
+    ],
+    "created_at": "2025-11-02T07:13:13.867296",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867298"
+  },
+  "salma_98736841": {
+    "farmerId": "salma_98736841",
+    "name": "Salma",
+    "email": "salma@farm.tn",
+    "location": "Ariana",
+    "vegetation": [
+      "onion",
+      "cucumber"
+    ],
+    "created_at": "2025-11-02T07:13:13.867378",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867380"
+  },
+  "nadia_4d3fefd8": {
+    "farmerId": "nadia_4d3fefd8",
+    "name": "Nadia",
+    "email": "nadia@farm.tn",
+    "location": "Kairouan",
+    "vegetation": [
+      "watermelon",
+      "cucumber",
+      "olive",
+      "potato"
+    ],
+    "created_at": "2025-11-02T07:13:13.867483",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867484"
+  },
+  "leila_01dcae1a": {
+    "farmerId": "leila_01dcae1a",
+    "name": "Leila",
+    "email": "leila@farm.tn",
+    "location": "Sousse",
+    "vegetation": [
+      "eggplant",
+      "olive"
+    ],
+    "created_at": "2025-11-02T07:13:13.867561",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867563"
+  },
+  "samira_b3d81d2b": {
+    "farmerId": "samira_b3d81d2b",
+    "name": "Samira",
+    "email": "samira@farm.tn",
+    "location": "Tunis",
+    "vegetation": [
+      "onion",
+      "cucumber",
+      "citrus"
+    ],
+    "created_at": "2025-11-02T07:13:13.867651",
+    "vegetationUpdatedAt": "2025-11-02T07:13:13.867653"
+  }
+}
