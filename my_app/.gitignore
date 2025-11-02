@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Voice chat configuration with hardcoded keys (if developers choose to hardcode)
+# Note: Keep this commented by default since we use environment variables
+# Uncomment if you hardcode API keys in voice_chat_config.dart
+#lib/voice_chat_config.dart
+
+# Environment variables file (never commit!)
+.env
+.env.local
+.env.*.local
