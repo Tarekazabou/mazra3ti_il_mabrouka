@@ -87,7 +87,7 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
       // Request microphone permission
       final micStatus = await Permission.microphone.request();
       if (!micStatus.isGranted) {
-        throw Exception('يجب السماح باستخدام الميكروفون');
+        throw Exception('PERMISSION_DENIED: يجب السماح باستخدام الميكروفون');
       }
 
       // Initialize LiveKit room
@@ -166,11 +166,13 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
 
   /// Process audio track and send to Gemini
   void _processAudioTrack(RemoteAudioTrack track) {
-    // In a full implementation, you would:
-    // 1. Convert audio to text using speech-to-text
+    // TODO: Implement full voice pipeline
+    // 1. Convert audio to text using speech-to-text (Google Cloud Speech-to-Text)
     // 2. Send text to Gemini
-    // 3. Get response and convert to speech
+    // 3. Get response and convert to speech (Google Cloud Text-to-Speech)
     // 4. Send speech back through LiveKit
+    // See: https://cloud.google.com/speech-to-text
+    // See: https://cloud.google.com/text-to-speech
     
     // For now, we'll simulate the flow
     _simulateVoiceInteraction();
@@ -178,9 +180,10 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
 
   /// Simulate voice interaction (placeholder for actual implementation)
   void _simulateVoiceInteraction() async {
+    // TODO: Replace with actual implementation
     // This is a placeholder. In production:
-    // - Use Google Speech-to-Text to convert audio to text
-    // - Process with Gemini
+    // - Use Google Speech-to-Text API to convert audio to text
+    // - Process with Gemini (already implemented in _queryGemini)
     // - Use Text-to-Speech to convert response back to audio
     // - Stream audio through LiveKit
     
@@ -196,22 +199,28 @@ class _VegetationDisplayWidgetState extends State<VegetationDisplayWidget> {
     }
 
     try {
+      // Capture farm data at the start to avoid stale data during async operation
       final farm = Provider.of<FarmModel>(context, listen: false);
+      final farmVegetation = farm.hasVegetation() ? farm.vegetation.join('، ') : 'لا يوجد نباتات';
+      final farmVegCount = farm.getVegetationCount();
+      final pumpStatus = farm.getPumpStatusText();
+      final soilMoisture = farm.getSoilMoistureText();
+      final tankWater = farm.getTankWaterText();
       
       // Build context from farm data
-      final context = '''
+      final contextMessage = '''
 معلومات المزرعة الحالية:
-- النباتات المزروعة: ${farm.hasVegetation() ? farm.vegetation.join('، ') : 'لا يوجد نباتات'}
-- عدد النباتات: ${farm.getVegetationCount()}
-- حالة المضخة: ${farm.getPumpStatusText()}
-- رطوبة التربة: ${farm.getSoilMoistureText()}
-- حالة الخزان: ${farm.getTankWaterText()}
+- النباتات المزروعة: $farmVegetation
+- عدد النباتات: $farmVegCount
+- حالة المضخة: $pumpStatus
+- رطوبة التربة: $soilMoisture
+- حالة الخزان: $tankWater
 
 سؤال المزارع: $query
 ''';
 
       final response = await _chatSession!.sendMessage(
-        Content.text(context),
+        Content.text(contextMessage),
       );
 
       final responseText = response.text ?? 'عذراً، لم أستطع فهم السؤال';
