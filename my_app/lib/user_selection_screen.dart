@@ -17,16 +17,16 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
 
   // Sample user IDs from the generated users
   final List<Map<String, String>> _sampleUsers = [
-    {'id': 'mabrouka_1002dfc1', 'name': 'Mabrouka', 'location': 'Ben Arous'},
-    {'id': 'fatma_62165644', 'name': 'Fatma', 'location': 'Monastir'},
-    {'id': 'aicha_5204363a', 'name': 'Aicha', 'location': 'Nabeul'},
-    {'id': 'khadija_4c319fe7', 'name': 'Khadija', 'location': 'Sousse'},
-    {'id': 'zahra_abe68881', 'name': 'Zahra', 'location': 'Tunis'},
-    {'id': 'amina_657cdff1', 'name': 'Amina', 'location': 'Tataouine'},
-    {'id': 'salma_98736841', 'name': 'Salma', 'location': 'Ariana'},
-    {'id': 'nadia_4d3fefd8', 'name': 'Nadia', 'location': 'Kairouan'},
-    {'id': 'leila_01dcae1a', 'name': 'Leila', 'location': 'Sousse'},
-    {'id': 'samira_b3d81d2b', 'name': 'Samira', 'location': 'Tunis'},
+    {'id': 'mabrouka_ba7847bb', 'name': 'Mabrouka', 'location': 'Sfax'},
+    {'id': 'fatma_b377be09', 'name': 'Fatma', 'location': 'Ariana'},
+    {'id': 'aicha_b3e1569a', 'name': 'Aicha', 'location': 'Zaghouan'},
+    {'id': 'khadija_7f059615', 'name': 'Khadija', 'location': 'Tunis'},
+    {'id': 'zahra_d51105c7', 'name': 'Zahra', 'location': 'Kasserine'},
+    {'id': 'amina_e5bd2141', 'name': 'Amina', 'location': 'Gafsa'},
+    {'id': 'salma_96dd8449', 'name': 'Salma', 'location': 'Sousse'},
+    {'id': 'nadia_6eab7ce8', 'name': 'Nadia', 'location': 'Monastir'},
+    {'id': 'leila_bebee866', 'name': 'Leila', 'location': 'Gabès'},
+    {'id': 'samira_0e16d40d', 'name': 'Samira', 'location': 'Sfax'},
   ];
 
   Future<void> _selectUser(String userId, String name) async {
