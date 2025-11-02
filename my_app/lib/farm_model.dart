@@ -26,7 +26,7 @@ class FarmModel extends ChangeNotifier {
   bool _isLoading = false;
   // Last AI decision cache to drive main status card
   Map<String, dynamic>? _lastAiDecision; // contents of 'decision' from backend
-  String? _lastAiReasoning;
+  Map<String, dynamic>? _lastAiReasoning; // contents of 'reasoning' from backend
   bool _aiWateringInProgress = false;
   int? _aiRemainingMinutes;
 
@@ -365,7 +365,9 @@ class FarmModel extends ChangeNotifier {
         if (result['decision'] is Map<String, dynamic>) {
           _lastAiDecision = Map<String, dynamic>.from(result['decision']);
         }
-        _lastAiReasoning = result['reasoning']?.toString();
+        if (result['reasoning'] is Map<String, dynamic>) {
+          _lastAiReasoning = Map<String, dynamic>.from(result['reasoning']);
+        }
         notifyListeners();
       }
       return result;
@@ -463,12 +465,17 @@ class FarmModel extends ChangeNotifier {
       final shouldWater = _lastAiDecision!['should_water'] == true;
       final duration = _lastAiDecision!['duration_minutes'];
       final intensity = _lastAiDecision!['intensity_percent'];
-      final conf = _lastAiDecision!['confidence'];
       if (shouldWater) {
-        return 'مدة الري الموصى بها: ${duration ?? '-'} دقيقة • الشدة: ${intensity ?? '-'}% • الثقة: ${((conf ?? 0) * 100).round()}%';
+        return 'مدة الري الموصى بها: ${duration ?? '-'} دقيقة • الشدة: ${intensity ?? '-'}%';
       }
       // If not watering, show reasoning if available
-      return _lastAiReasoning ?? 'التربة مناسبة، لا حاجة للري الآن';
+      if (_lastAiReasoning != null) {
+        final rationale = _lastAiReasoning!['decision_rationale']?.toString() ?? '';
+        if (rationale.isNotEmpty && rationale.length < 100) {
+          return rationale;
+        }
+      }
+      return 'التربة مناسبة، لا حاجة للري الآن';
     }
     // Fallback
     if (_soilMoisture == SoilMoisture.dry) {

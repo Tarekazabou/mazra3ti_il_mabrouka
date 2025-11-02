@@ -772,23 +772,151 @@ class OverviewScreen extends StatelessWidget {
       return;
     }
 
-    final recommendation = response['recommendation'] ?? response['message'] ?? 'تم استلام التوصية';
+    // Check if already watering
+    if (response['watering_in_progress'] == true) {
+      final remainingMin = response['remaining_minutes'] ?? 0;
+      final message = 'الري جارٍ بالفعل\n$remainingMin دقيقة متبقية';
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Text(
+              'حالة الري',
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              message,
+              style: GoogleFonts.cairo(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('حسناً'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Display AI decision
+    final decision = response['decision'];
+    final reasoning = response['reasoning'];
+    final weather = response['weather'];
+    
+    if (decision == null) {
+      _showSnack(context, 'لا توجد بيانات قرار');
+      return;
+    }
+
+    final shouldWater = decision['should_water'] == true;
+    final duration = decision['duration_minutes'] ?? 0;
+    final intensity = decision['intensity_percent'] ?? 0;
+    
+    // Build Arabic message with larger text
+    String message = '';
+    if (shouldWater) {
+      message = '💧 يُنصح بالري\n\n';
+      message += '⏱️ المدة المقترحة: $duration دقيقة\n';
+      message += '💪 الشدة المقترحة: $intensity%\n\n';
+    } else {
+      message = '⛔ لا حاجة للري حالياً\n\n';
+    }
+
+    // Add reasoning if available - translate from English to Arabic
+    if (reasoning != null) {
+      final decisionRationale = reasoning['decision_rationale']?.toString() ?? '';
+      final weatherAnalysis = reasoning['weather_analysis']?.toString() ?? '';
+      final confidence = reasoning['confidence_level']?.toString() ?? '';
+      
+      if (decisionRationale.isNotEmpty) {
+        // Translate common phrases to Arabic
+        String arabicRationale = _translateToArabic(decisionRationale);
+        message += '📝 التفسير:\n$arabicRationale\n\n';
+      }
+      
+      if (weatherAnalysis.isNotEmpty) {
+        String arabicWeather = _translateToArabic(weatherAnalysis);
+        message += '🌦️ تحليل الطقس:\n$arabicWeather\n\n';
+      }
+      
+      if (confidence.isNotEmpty) {
+        final confidenceAr = confidence == 'high' ? 'عالية' : 
+                            confidence == 'medium' ? 'متوسطة' : 'منخفضة';
+        message += '✅ مستوى الثقة: $confidenceAr';
+      }
+    }
+
+    // Add current weather if available
+    if (weather != null && weather['current'] != null) {
+      final temp = weather['current']['temperature'];
+      final humidity = weather['current']['humidity'];
+      message += '\n\n🌡️ درجة الحرارة الحالية: ${temp}°C\n';
+      message += '💨 نسبة الرطوبة: ${humidity}%';
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(
-            'توصية الذكاء الاصطناعي',
-            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          content: Text(
-            recommendation.toString(),
-            style: GoogleFonts.cairo(fontSize: 16),
+          title: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: shouldWater 
+                  ? [const Color(0xFF4CAF50), const Color(0xFF2E7D32)]
+                  : [const Color(0xFFF44336), const Color(0xFFC62828)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              shouldWater ? '💧 توصية الري' : '⛔ توصية عدم الري',
+              style: GoogleFonts.cairo(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              message,
+              style: GoogleFonts.cairo(
+                fontSize: 18,
+                height: 1.8,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.right,
+            ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('حسناً'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00BCD4),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(
+                  'حسناً',
+                  style: GoogleFonts.cairo(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
           ],
         );
@@ -830,6 +958,79 @@ class OverviewScreen extends StatelessWidget {
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  String _translateToArabic(String englishText) {
+    // Translation map for common AI decision phrases
+    final translations = {
+      // Common phrases
+      'Despite the rain forecast': 'على الرغم من توقعات المطر',
+      'the expected precipitation is negligible': 'كمية الأمطار المتوقعة ضئيلة جداً',
+      'unlikely to significantly impact soil moisture': 'من غير المحتمل أن تؤثر بشكل كبير على رطوبة التربة',
+      'Maintaining the XGBoost recommendation': 'الحفاظ على توصية النموذج الذكي',
+      'ensures optimal moisture levels': 'يضمن مستويات رطوبة مثالية',
+      'for plant health and productivity': 'لصحة النبات وإنتاجيته',
+      'plant health': 'صحة النبات',
+      'productivity': 'الإنتاجية',
+      
+      // Weather related
+      'The forecast indicates': 'تشير التوقعات إلى',
+      'a high probability of rain': 'احتمالية عالية للمطر',
+      'at several points': 'في عدة نقاط',
+      'in the next 24 hours': 'خلال الـ 24 ساعة القادمة',
+      'but the expected precipitation is minimal': 'لكن كمية الأمطار المتوقعة قليلة جداً',
+      'total': 'الإجمالي',
+      'no rain is expected': 'لا يُتوقع هطول أمطار',
+      'Heavy rain expected': 'يُتوقع هطول أمطار غزيرة',
+      'within 6 hours': 'خلال 6 ساعات',
+      'Light rain': 'أمطار خفيفة',
+      'Moderate rain': 'أمطار متوسطة',
+      
+      // Watering decisions
+      'XGBoost recommends watering': 'النموذج الذكي يوصي بالري',
+      'XGBoost recommends': 'النموذج الذكي يوصي',
+      'with a duration of': 'بمدة',
+      'and intensity of': 'وشدة',
+      'based on current conditions': 'بناءً على الظروف الحالية',
+      'No watering needed': 'لا حاجة للري',
+      'Watering recommended': 'يُنصح بالري',
+      
+      // Soil conditions
+      'Given the current soil moisture': 'بالنظر إلى رطوبة التربة الحالية',
+      'the absence of any forecasted rain': 'وعدم وجود أي أمطار متوقعة',
+      'the recommendation to not water is appropriate': 'فإن توصية عدم الري مناسبة',
+      'Watering at this time would be unnecessary': 'الري في هذا الوقت غير ضروري',
+      'and could lead to waterlogging': 'وقد يؤدي إلى تشبع التربة بالماء',
+      'soil moisture': 'رطوبة التربة',
+      'optimal moisture': 'الرطوبة المثالية',
+      
+      // Confidence
+      'high': 'عالية',
+      'medium': 'متوسطة',
+      'low': 'منخفضة',
+      
+      // Units and numbers
+      'minutes': 'دقائق',
+      'minute': 'دقيقة',
+      'percent': 'بالمئة',
+      'mm': 'مم',
+      'hours': 'ساعات',
+      'hour': 'ساعة',
+      'days': 'أيام',
+      'day': 'يوم',
+    };
+
+    String result = englishText;
+    
+    // Replace phrases (longer phrases first to avoid partial replacements)
+    final sortedKeys = translations.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+    
+    for (var key in sortedKeys) {
+      result = result.replaceAll(key, translations[key]!);
+    }
+    
+    return result;
   }
 
 }

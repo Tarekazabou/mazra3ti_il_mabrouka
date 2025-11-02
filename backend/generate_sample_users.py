@@ -58,8 +58,12 @@ def create_sample_user(farmer_data):
     
     # Random soil properties
     soil_types = ["clay", "loam", "sandy", "silty"]
+    soil_type_encoding = {"clay": 1, "loam": 2, "sandy": 3, "silty": 4}
+    
+    soil_type = random.choice(soil_types)
     soil_properties = {
-        "soil_type": random.choice(soil_types),
+        "soil_type": soil_type,
+        "soil_type_encoded": soil_type_encoding[soil_type],
         "soil_compaction": random.randint(40, 70),
         "slope_degrees": round(random.uniform(0.5, 8.0), 1)
     }
