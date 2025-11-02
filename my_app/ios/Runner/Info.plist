@@ -45,5 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>نحتاج إلى الوصول إلى الميكروفون للمحادثة الصوتية مع المساعد الزراعي</string>
+	<key>NSCameraUsageDescription</key>
+	<string>نحتاج إلى الكاميرا لمشاركة الفيديو في المحادثة</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>نحتاج إلى الوصول إلى الشبكة المحلية للاتصال بخدمة الصوت</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>نحتاج إلى البلوتوث لاستخدام الأجهزة الصوتية</string>
 </dict>
 </plist>
