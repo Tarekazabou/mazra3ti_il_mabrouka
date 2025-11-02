@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مزرعة المبروكة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message {
+            background: #ef4444;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-left: 5px;
+        }
+
+        #loadingSpinner {
+            display: none;
+            text-align: center;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 لوحة تحكم مزرعة المبروكة 🌾</h1>
+
+        <!-- Create Account Section -->
+        <div class="card">
+            <h2>إنشاء حساب للمبروكة</h2>
+            <form id="createAccountForm">
+                <div class="form-group">
+                    <label for="farmerName">اسم المزارعة:</label>
+                    <input type="text" id="farmerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="farmerEmail">البريد الإلكتروني:</label>
+                    <input type="email" id="farmerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="farmerPassword">كلمة المرور:</label>
+                    <input type="password" id="farmerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="farmLocation">موقع المزرعة:</label>
+                    <input type="text" id="farmLocation" required>
+                </div>
+                <div class="form-group">
+                    <label for="farmSize">حجم المزرعة (بالهكتار):</label>
+                    <input type="number" id="farmSize" step="0.1" required>
+                </div>
+                <button type="submit">إنشاء حساب</button>
+                <div id="accountSuccess" class="success-message"></div>
+                <div id="accountError" class="error-message"></div>
+            </form>
+        </div>
+
+        <!-- Add Vegetation Section -->
+        <div class="card">
+            <h2>إضافة نباتات للمزرعة</h2>
+            <form id="addVegetationForm">
+                <div class="form-group">
+                    <label for="farmerIdVeg">معرف المزارعة:</label>
+                    <input type="text" id="farmerIdVeg" placeholder="أدخل معرف المزارعة" required>
+                </div>
+                <div class="form-group">
+                    <label for="vegetationType">نوع النبات:</label>
+                    <input type="text" id="vegetationType" placeholder="مثال: بطاطس، طماطم، بصل" required>
+                    <small style="display: block; margin-top: 5px; color: #666;">يمكنك إدخال نوع واحد أو أكثر مفصولة بفاصلة</small>
+                </div>
+                <button type="submit">إضافة النباتات</button>
+                <div id="vegetationSuccess" class="success-message"></div>
+                <div id="vegetationError" class="error-message"></div>
+            </form>
+        </div>
+
+        <!-- Add Measurements Section -->
+        <div class="card">
+            <h2>إضافة قياسات المزرعة</h2>
+            <form id="addMeasurementsForm">
+                <div class="form-group">
+                    <label for="farmerIdMeas">معرف المزارعة:</label>
+                    <input type="text" id="farmerIdMeas" placeholder="أدخل معرف المزارعة" required>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="soilMoisture">رطوبة التربة:</label>
+                        <select id="soilMoisture" required>
+                            <option value="dry">جافة</option>
+                            <option value="moderate" selected>معتدلة</option>
+                            <option value="wet">رطبة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pumpStatus">حالة المضخة:</label>
+                        <select id="pumpStatus" required>
+                            <option value="off" selected>مقفولة</option>
+                            <option value="on">شغالة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tankWater">ماء الخزان:</label>
+                        <select id="tankWater" required>
+                            <option value="full">كاملة</option>
+                            <option value="half" selected>نص نص</option>
+                            <option value="low">قليلة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weatherAlert">تحذير الطقس:</label>
+                        <select id="weatherAlert" required>
+                            <option value="nothing" selected>لا شيء</option>
+                            <option value="rainTomorrow">مطر غداً</option>
+                            <option value="veryHot">حار جداً</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="controlMode">وضع التحكم:</label>
+                        <select id="controlMode" required>
+                            <option value="automatic" selected>تلقائي</option>
+                            <option value="manual">يدوي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valveStatus">حالة الصمام:</label>
+                        <select id="valveStatus" required>
+                            <option value="closed" selected>مغلق</option>
+                            <option value="open">مفتوح</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">حفظ القياسات</button>
+                <div id="measurementsSuccess" class="success-message"></div>
+                <div id="measurementsError" class="error-message"></div>
+            </form>
+        </div>
+
+        <div id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>جاري المعالجة...</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // TODO: Replace with your Firebase config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Helper functions
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        // Create Account Form Handler
+        document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+
+            try {
+                const email = document.getElementById('farmerEmail').value;
+                const password = document.getElementById('farmerPassword').value;
+                const name = document.getElementById('farmerName').value;
+                const location = document.getElementById('farmLocation').value;
+                const size = parseFloat(document.getElementById('farmSize').value);
+
+                // Create authentication account
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userId = userCredential.user.uid;
+
+                // Create farmer document in Firestore
+                await setDoc(doc(db, 'farmers', userId), {
+                    name: name,
+                    email: email,
+                    farmLocation: location,
+                    farmSize: size,
+                    createdAt: Timestamp.now(),
+                    vegetation: []
+                });
+
+                // Create initial measurements document
+                await setDoc(doc(db, 'measurements', userId), {
+                    farmerId: userId,
+                    soilMoisture: 'moderate',
+                    pumpStatus: 'off',
+                    tankWater: 'half',
+                    weatherAlert: 'nothing',
+                    controlMode: 'automatic',
+                    valveStatus: 'closed',
+                    lastUpdated: Timestamp.now()
+                });
+
+                showMessage('accountSuccess', `تم إنشاء الحساب بنجاح! معرف المزارعة: ${userId}`);
+                document.getElementById('createAccountForm').reset();
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('accountError', `خطأ: ${error.message}`, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Add Vegetation Form Handler
+        document.getElementById('addVegetationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+
+            try {
+                const farmerId = document.getElementById('farmerIdVeg').value.trim();
+                const vegetationInput = document.getElementById('vegetationType').value.trim();
+                
+                if (!vegetationInput) {
+                    throw new Error('الرجاء إدخال نوع النبات');
+                }
+
+                // Split by comma and clean up the vegetation types
+                const vegetation = vegetationInput
+                    .split(',')
+                    .map(v => v.trim())
+                    .filter(v => v.length > 0);
+
+                if (vegetation.length === 0) {
+                    throw new Error('الرجاء إدخال نوع نبات واحد على الأقل');
+                }
+
+                // Update farmer document with vegetation
+                const farmerRef = doc(db, 'farmers', farmerId);
+                await updateDoc(farmerRef, {
+                    vegetation: vegetation,
+                    vegetationUpdatedAt: Timestamp.now()
+                });
+
+                showMessage('vegetationSuccess', 'تم إضافة النباتات بنجاح!');
+                document.getElementById('addVegetationForm').reset();
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('vegetationError', `خطأ: ${error.message}`, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Add Measurements Form Handler
+        document.getElementById('addMeasurementsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+
+            try {
+                const farmerId = document.getElementById('farmerIdMeas').value.trim();
+                const soilMoisture = document.getElementById('soilMoisture').value;
+                const pumpStatus = document.getElementById('pumpStatus').value;
+                const tankWater = document.getElementById('tankWater').value;
+                const weatherAlert = document.getElementById('weatherAlert').value;
+                const controlMode = document.getElementById('controlMode').value;
+                const valveStatus = document.getElementById('valveStatus').value;
+
+                // Update or create measurements document
+                const measurementRef = doc(db, 'measurements', farmerId);
+                await setDoc(measurementRef, {
+                    farmerId: farmerId,
+                    soilMoisture: soilMoisture,
+                    pumpStatus: pumpStatus,
+                    tankWater: tankWater,
+                    weatherAlert: weatherAlert,
+                    controlMode: controlMode,
+                    valveStatus: valveStatus,
+                    lastUpdated: Timestamp.now()
+                }, { merge: true });
+
+                // Also add to measurement history
+                await addDoc(collection(db, 'measurementHistory'), {
+                    farmerId: farmerId,
+                    soilMoisture: soilMoisture,
+                    pumpStatus: pumpStatus,
+                    tankWater: tankWater,
+                    weatherAlert: weatherAlert,
+                    controlMode: controlMode,
+                    valveStatus: valveStatus,
+                    timestamp: Timestamp.now()
+                });
+
+                showMessage('measurementsSuccess', 'تم حفظ القياسات بنجاح!');
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('measurementsError', `خطأ: ${error.message}`, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>
